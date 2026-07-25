@@ -28,7 +28,7 @@ SOI FinFET에서 drain-side low-k composite spacer 구조를 설계하고,
 
 평일 = 학교 TCAD PC 실행, 주말 = 결과 정리 및 보고서/발표자료 준비. 확인된 TCAD 툴은 Synopsys Sentaurus(SWB, sprocess/sdevice)다. 진행이 늦어지면 6절 "최소 성공 기준"으로 범위를 축소한다. 각 항목의 상세 체크리스트는 1절의 같은 주차 번호를 참고한다.
 
-- [ ] 2026-07-25(토)~07-26(일) — Week0: 준비
+- [ ] 2026-07-25(토)~07-26(일) — Week0: 준비 및 프로젝트 이해
 - [ ] 2026-07-27(월)~07-31(금) — Week1: 환경 확인 + baseline 구조/지표 확보
 - [ ] 2026-08-01(토)~08-02(일) — Weekend1: baseline 결과 정리, 보고서 배경/선행연구 초안
 - [ ] 2026-08-03(월)~08-07(금) — Week2: proposed 구현 + initial DOE/anchor 생성 및 실행 착수
@@ -47,8 +47,8 @@ SOI FinFET에서 drain-side low-k composite spacer 구조를 설계하고,
 
 ### Week0 (07-25~07-26, 주말/준비)
 
-- [ ] `project.yaml`의 `fixed` 값 확정: `gate_length_nm`, `fin_height_nm`, `fin_width_nm`, `eot_nm`, `vdd_V`
-- [ ] `fabrication_grid.step_nm` 확정
+- [ ] `project.yaml`의 `fixed` 항목이 뭘 채워야 하는지만 목록 확인 (실제 숫자는 Week1에 원본 example을 열어서 읽어온 뒤 채운다 — 임의로 정하지 않음)
+- [ ] `fabrication_grid.step_nm` 가안 검토: 원본 example에서 읽어오는 값이 아니라 최종 후보 반올림에 쓸 프로젝트 차원의 가정값. 우선 0.5nm 유지, Week1에 원본 example의 spacer 공정 step과 비교해 현실성만 점검
 - [ ] `baseline_sprocess`, `proposed_sprocess`, `inverter`, `fo4_inverter_benchmark` template 내용 재검토
 - [ ] 노트북 ↔ 학교 PC repo 동기화 절차 점검 (`git clone`/`git pull` 가능 여부)
 
@@ -66,6 +66,8 @@ SOI FinFET에서 drain-side low-k composite spacer 구조를 설계하고,
 - [ ] structure/mesh/Id-Vg 결과 확인
 - [ ] 결과 파일 USB/외장 SSD로 복사 테스트
 - [ ] 우리 repo를 TCAD PC로 복사 또는 `git clone` 가능 여부 확인
+- [ ] 원본 example의 gate_length, fin_height, fin_width, EOT, VDD 실제 값 확인 → `project.yaml`의 `fixed`에 기록
+- [ ] 원본 example의 spacer 공정 step(치수 단위)을 참고해 `fabrication_grid.step_nm`(현재 0.5nm 가안) 현실성 점검
 
 Baseline (대칭 Si3N4 spacer, source/drain 동일 길이):
 
