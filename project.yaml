@@ -48,7 +48,7 @@ constraints:
   - w_low_k_nm <= l_sp_d_nm
 
 doe:
-  initial_samples: 48
+  initial_samples: 24
   method: lhs
   seed: 20260723
   output: 03_doe/cases/initial_doe_cases.csv
@@ -69,11 +69,13 @@ fabrication_grid:
 
 active_doe:
   enabled: true
-  strategy: surrogate_assisted_active_sampling
+  strategy: gp_ucb_active_sampling
+  strategy_note: single-objective scalarized Bayesian optimization (GP surrogate, RBF kernel, UCB acquisition); not multi-objective BO (MOBO) or a genetic algorithm (NSGA-II)
   default_mode: device_screening
   candidate_pool_size: 4096
   suggestion_batch_size: 8
   exploration_weight: 0.35
+  gp_noise_std: 0.05
   min_distance_nm: 0.25
   modes:
     device_screening:

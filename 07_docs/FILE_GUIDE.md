@@ -30,7 +30,7 @@
 주의:
 
 - TCAD 결과를 실제 제작 결과처럼 표현하지 않는다.
-- Initial DOE 48개를 최종 통계 검증으로 과장하지 않는다.
+- Initial DOE 24개를 최종 통계 검증으로 과장하지 않는다.
 - Asymmetric/dual-k/composite spacer 구조 자체의 최초성을 주장하지 않는다.
 - Pal et al. 2015 등 직접 중복 선행연구를 본문에서 반드시 인용한다.
 
@@ -74,7 +74,7 @@
 
 - 결과를 확인한 뒤 좋은 결과가 나오도록 범위나 목적함수를 몰래 바꾸지 않는다.
 - 범위 변경 시 commit과 이유를 남긴다.
-- `active_doe`에 실제 구현하지 않은 ANN, MOBO, NSGA-II 같은 알고리즘명을 넣지 않는다.
+- `active_doe`에 실제 구현하지 않은 ANN, MOBO(multi-objective BO), NSGA-II 같은 알고리즘명을 넣지 않는다. GP 기반 single-objective Bayesian optimization(현재 구현)은 정확한 표현이므로 그대로 사용 가능.
 
 ### `requirements.txt`
 
@@ -192,7 +192,7 @@ Initial DOE case를 생성한다.
 
 현재 기본 설정:
 
-- sample 수: `project.yaml`의 `doe.initial_samples`, 기본 48개
+- sample 수: `project.yaml`의 `doe.initial_samples`, 기본 24개
 - 방법: LHS 또는 Sobol
 - 출력: `03_doe/cases/initial_doe_cases.csv`
 
@@ -212,7 +212,7 @@ Baseline reference, center, feasible corner case를 생성한다.
 역할:
 
 - LHS/Sobol sample만으로 부족한 기준점과 극단 조건 보강
-- 48개 DOE의 해석 신뢰성 보조
+- 24개 DOE의 해석 신뢰성 보조
 
 ### `03_doe/suggest_active_cases.py`
 
@@ -228,8 +228,9 @@ Baseline reference, center, feasible corner case를 생성한다.
 
 알고리즘:
 
-- 완료된 결과로 간단한 surrogate model 학습
-- 성능 예측값과 surrogate uncertainty를 함께 고려
+- 완료된 결과의 여러 지표를 정규화 후 평균 내 하나의 scalarized utility로 결합
+- 그 utility에 Gaussian Process(RBF kernel) surrogate를 학습 (marginal likelihood 기준 length-scale grid search, numpy/scipy만 사용)
+- GP posterior mean과 std를 함께 고려하는 UCB(Upper Confidence Bound) acquisition score 계산
 - 기존 sample과 너무 가까운 후보 제거
 - fabrication grid로 snapping된 후보 추천
 - `--mode device_screening`은 Ion/Ioff/DIBL/Cgd 기준으로 회로 검증 전 후보를 줄인다.
@@ -237,9 +238,9 @@ Baseline reference, center, feasible corner case를 생성한다.
 
 주의:
 
-- 이 스크립트는 거대한 AI 모델이 아니라 제한된 TCAD 예산을 효율적으로 쓰기 위한 lightweight surrogate-assisted sampler다.
-- 보고서에는 ANN, MOBO, NSGA-II를 실제 구현한 것처럼 쓰지 않는다.
-- Bayesian optimization이나 genetic algorithm은 실제 구현 전까지 배경 또는 향후 확장으로만 언급한다.
+- 이 스크립트는 거대한 AI 모델이 아니라 제한된 TCAD 예산을 효율적으로 쓰기 위한 lightweight, dependency-free GP 기반 **single-objective Bayesian optimization**이다. "Bayesian optimization을 구현했다"는 정확한 표현이므로 그대로 사용 가능.
+- 다만 여러 지표를 scalarized utility로 합친 단일 목적함수 최적화이므로, 정식 multi-objective BO(MOBO)는 아니다.
+- 보고서에는 ANN, MOBO, NSGA-II를 실제 구현한 것처럼 쓰지 않는다 (이 세 가지는 실제 구현하지 않음).
 
 ### `03_doe/generate_local_refinement_cases.py`
 
@@ -456,7 +457,7 @@ TCAD raw output의 로컬 보관 위치다.
 1. 원본 3D FinFET example 확보
 2. baseline 구조 재현
 3. proposed 구조 구현
-4. initial DOE 48개 + anchor case 생성
+4. initial DOE 24개 + anchor case 생성
 5. TCAD 실행 및 all_results.csv 정리
 6. Device screening Pareto 계산
 7. device active DOE 후보 추천 및 실행
@@ -511,7 +512,7 @@ fabrication-aware grid snapping, robust validation workflow를 구축한다.
 - robust/variability analysis를 최초로 수행하였다.
 - SiO2 low-k spacer가 기존에 없던 신공정이다.
 - TCAD 결과를 실제 fabrication 또는 실측 결과로 검증하였다.
-- ANN/MOBO/NSGA-II 기반 최적화를 수행하였다. 단, 실제 구현 및 검증한 경우는 제외한다.
+- ANN/MOBO(multi-objective BO)/NSGA-II 기반 최적화를 수행하였다. 단, 실제 구현 및 검증한 경우는 제외한다 (GP 기반 single-objective Bayesian optimization은 실제 구현했으므로 정확히 그렇게 표현한다).
 
 그림 사용 원칙:
 

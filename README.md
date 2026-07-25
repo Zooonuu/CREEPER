@@ -23,7 +23,7 @@
 
 목표는 Drain 쪽의 `Cgd`, 전계 집중, DIBL, 누설전류를 낮추면서 Source 쪽의 구동전류 손실을 최소화하고, 최종적으로 FO4 inverter benchmark의 delay, power, energy 및 EDP를 개선하는 것이다.
 
-이 프로젝트의 추가 기여는 **TCAD 실행 횟수가 제한된 상황에서 설계공간을 더 빠르고 신뢰성 있게 탐색하기 위한 알고리즘 흐름**이다. 초기 DOE 48개만으로 최종 신뢰성을 주장하지 않고, anchor case, surrogate-assisted active DOE, fabrication-aware grid snapping, local refinement, robust validation을 순차적으로 적용한다.
+이 프로젝트의 추가 기여는 **TCAD 실행 횟수가 제한된 상황에서 설계공간을 더 빠르고 신뢰성 있게 탐색하기 위한 알고리즘 흐름**이다. 초기 DOE 24개만으로 최종 신뢰성을 주장하지 않고, anchor case, surrogate-assisted active DOE, fabrication-aware grid snapping, local refinement, robust validation을 순차적으로 적용한다.
 
 ---
 
@@ -31,9 +31,9 @@
 
 ### 문제 상황
 
-3D TCAD는 실행 시간이 길기 때문에 수백~수천 개 조합을 무작정 돌리기 어렵다. 또한 LHS/Sobol DOE는 `3.12 nm`처럼 실제 공정 단위로 설명하기 애매한 연속값을 만들 수 있다. 따라서 단순히 48개 DOE만 수행하면 다음 문제가 남는다.
+3D TCAD는 실행 시간이 길기 때문에 수백~수천 개 조합을 무작정 돌리기 어렵다. 또한 LHS/Sobol DOE는 `3.12 nm`처럼 실제 공정 단위로 설명하기 애매한 연속값을 만들 수 있다. 따라서 단순히 24개 DOE만 수행하면 다음 문제가 남는다.
 
-- 48개 sample만으로 전역 최적이나 신뢰성을 강하게 주장하기 어렵다.
+- 24개 sample만으로 전역 최적이나 신뢰성을 강하게 주장하기 어렵다.
 - TCAD 실행 예산이 부족해 brute-force sweep이 불가능하다.
 - 연속 DOE 값이 실제 fabrication grid와 맞지 않을 수 있다.
 - nominal optimum 하나만 고르면 공정 편차에 취약할 수 있다.
@@ -43,11 +43,11 @@
 본 프로젝트는 이를 위해 **TCAD-Aware Fabrication-Constrained Active DOE Algorithm**을 사용한다.
 
 ```text
-1. Initial DOE 48개 생성
+1. Initial DOE 24개 생성
 2. Baseline, center, feasible corner anchor case 추가
 3. TCAD 결과 수집 및 공통 CSV 정리
 4. Device-level screening으로 회로 검증 후보 축소
-5. Surrogate model 기반 active DOE 후보 추천
+5. Surrogate model(Gaussian Process, GP-UCB acquisition) 기반 active DOE 후보 추천
 6. 후보를 fabrication-aware grid로 snapping
 7. Grid-snapped 후보의 circuit-level FO4 검증
 8. Circuit-level DTCO Pareto front 계산
@@ -57,7 +57,7 @@
 
 핵심 주장은 다음과 같다.
 
-> 48개 DOE는 최종 증명 데이터가 아니라 설계공간을 탐색하기 위한 초기 sample이다. 소자 지표는 비싼 회로 시뮬레이션 전에 후보를 줄이는 screening 지표로 사용하고, 최종 DTCO Pareto와 robust optimum 선정은 FO4 inverter benchmark의 delay, power, energy, EDP 같은 회로 지표를 기준으로 수행한다.
+> 24개 DOE는 최종 증명 데이터가 아니라 설계공간을 탐색하기 위한 초기 sample이다. 소자 지표는 비싼 회로 시뮬레이션 전에 후보를 줄이는 screening 지표로 사용하고, 최종 DTCO Pareto와 robust optimum 선정은 FO4 inverter benchmark의 delay, power, energy, EDP 같은 회로 지표를 기준으로 수행한다.
 
 ### 공정 grid 설명
 
@@ -96,9 +96,9 @@ robust validation: 3.0 nm 주변 ±0.3/±0.5 nm
 - "robust/variability analysis를 최초로 수행하였다."
 - "SiO2 low-k spacer가 기존에 없던 신공정이다."
 - "TCAD 결과를 실제 fabrication 또는 실측 결과로 검증하였다."
-- "NSGA-II, MOBO, ANN 기반 AI 최적화를 구현하였다." 단, 실제로 해당 알고리즘을 구현하고 검증한 경우는 제외한다.
+- "NSGA-II, MOBO(multi-objective Bayesian optimization), ANN 기반 AI 최적화를 구현하였다." 단, 실제로 해당 알고리즘을 구현하고 검증한 경우는 제외한다.
 
-알고리즘 기여는 `suggest_active_cases.py`에 구현된 lightweight surrogate-assisted active DOE workflow로 표현한다. 대규모 AI 모델이나 Bayesian multi-objective optimization을 구현하지 않았다면, 해당 용어는 배경/향후 확장으로만 언급한다.
+알고리즘 기여는 `suggest_active_cases.py`에 구현된 **lightweight, dependency-free Gaussian Process 기반 single-objective Bayesian optimization**(RBF kernel + marginal-likelihood length-scale 선택 + GP-UCB acquisition)으로 표현한다. 여러 device/circuit 지표는 하나의 scalarized utility로 결합해 단일 목적함수로 최적화하며, 이는 정식 multi-objective BO(MOBO, 예: qEHVI)나 NSGA-II 같은 유전 알고리즘, ANN(딥러닝) surrogate가 아니다. 이 세 가지를 실제로 구현하고 검증하지 않았다면 배경/향후 확장으로만 언급한다.
 
 원본 TCAD example, Sentaurus/Silvaco 설치본, 논문 PDF, 논문 figure는 각 라이선스와 저작권을 따른다. 학교 설치본의 proprietary deck이나 유료 논문 PDF는 공개 Git 저장소에 올리지 않는다. 논문 그림은 그대로 복제하지 않고, 직접 작성한 conceptual schematic과 출처 인용을 사용한다.
 
@@ -167,7 +167,7 @@ W_low_k: 0.0 ~ 4.0 nm
 
 ### 최적화 및 신뢰성
 
-- Initial DOE 48개 결과
+- Initial DOE 24개 결과
 - Baseline, center, feasible corner anchor case
 - Device-level screening 후보
 - Surrogate-assisted active DOE 추천 후보
@@ -209,7 +209,7 @@ project.yaml           공통 파라미터 및 알고리즘 설정
 → SOI single-fin baseline 재현
 → baseline 전기특성 검증
 → proposed spacer 구현
-→ initial DOE 48개 및 anchor case 실행
+→ initial DOE 24개 및 anchor case 실행
 → device-level screening
 → surrogate-assisted active DOE 후보 추천
 → grid-snapped local refinement
@@ -232,7 +232,7 @@ pip install -r requirements.txt
 python3 check_project.py
 ```
 
-Initial DOE 48개 생성:
+Initial DOE 24개 생성:
 
 ```bash
 python3 03_doe/generate_cases.py
@@ -341,7 +341,7 @@ TCAD 대용량 파일인 `.tdr`, `.plt`, `.log`, `.msh`, `.str` 등은 Git에 �
 1. `00_original_example`의 원본 파일은 수정하지 않는다.
 2. 실행 가능한 baseline이 생기기 전에는 DOE case를 대량 생성하지 않는다.
 3. Baseline과 Proposed는 핵심 spacer 조건 외에 동일한 조건을 사용한다.
-4. Initial DOE 48개는 탐색용 sample로만 설명한다.
+4. Initial DOE 24개는 탐색용 sample로만 설명한다.
 5. 최종 후보는 fabrication grid로 snapping한 뒤 재시뮬레이션한다.
 6. 실패한 case와 log도 삭제하지 않는다.
 7. 결과가 나온 뒤 목적함수와 합격조건을 임의로 변경하지 않는다.

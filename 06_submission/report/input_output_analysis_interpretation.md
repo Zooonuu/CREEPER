@@ -80,7 +80,7 @@ TCAD 단계의 input은 baseline/proposed process deck과 device deck이다.
 
 | 단계 | 출력 파일 | 역할 |
 |---|---|---|
-| Initial DOE | `03_doe/cases/initial_doe_cases.csv` | 초기 48개 탐색 case |
+| Initial DOE | `03_doe/cases/initial_doe_cases.csv` | 초기 24개 탐색 case |
 | Anchor case | `03_doe/cases/anchor_cases.csv` | baseline, center, feasible corner 기준점 |
 | Active DOE | `03_doe/cases/active_suggested_cases.csv` | surrogate가 추천한 추가 실행 후보 |
 | Local refinement | `03_doe/cases/local_refinement_cases.csv` | circuit Pareto 후보 주변 grid-snapped 후보 |
@@ -169,18 +169,17 @@ Device Pareto는 최종 결론이 아니라 비싼 회로 simulation 전에 후�
 
 ### 4.4 Active DOE
 
-이미 실행한 case로 lightweight surrogate model을 만들고 추가 실행 후보를 추천한다.
+이미 실행한 case로 Gaussian Process(GP) surrogate model을 만들고 추가 실행 후보를 추천한다.
 
 현재 구현은 다음을 사용한다.
 
-- 설계 변수의 quadratic feature
-- ridge regression surrogate
-- bootstrap ensemble으로 uncertainty 추정
+- 여러 device/circuit 지표를 하나의 scalarized utility로 결합 (정규화 후 평균)
+- RBF kernel GP surrogate, marginal likelihood 기준 length-scale 소규모 grid search
+- GP posterior mean/std 기반 UCB(Upper Confidence Bound) acquisition score
 - Sobol candidate pool
-- predicted utility + uncertainty 기반 acquisition score
 - fabrication grid snapping
 
-보고서에서는 "surrogate-assisted active DOE"라고 쓰고, 실제 구현하지 않은 ANN/MOBO/NSGA-II로 표현하지 않는다.
+이는 **single-objective Bayesian optimization(GP + UCB)** 이며, numpy/scipy만으로 구현한 dependency-free 버전이다. 보고서에서는 "GP-based single-objective Bayesian optimization (scalarized utility)"이라고 정확히 쓰고, 실제 구현하지 않은 multi-objective BO(MOBO)/NSGA-II/ANN으로 과장해서 표현하지 않는다.
 
 ### 4.5 Local refinement
 

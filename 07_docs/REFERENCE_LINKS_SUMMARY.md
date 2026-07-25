@@ -45,8 +45,8 @@
 |---|---|---|---|---|
 | R16 | M. D. McKay et al., "A Comparison of Three Methods for Selecting Values of Input Variables in the Analysis of Output from a Computer Code," Technometrics, 1979. | DOI: https://doi.org/10.1080/00401706.1979.10489755 / JSTOR stable page may require access: https://www.jstor.org/stable/1268522 | Latin Hypercube Sampling의 고전적 근거다. | DOE case 생성 방법 근거로 인용하고 seed/case list를 공개한다. |
 | R17 | K. Deb et al., "A Fast and Elitist Multiobjective Genetic Algorithm: NSGA-II," IEEE TEC, 2002. | DOI: https://doi.org/10.1109/4235.996017 | 다목적 Pareto 최적화 방법론의 대표 논문이다. | NSGA-II를 실제 구현하지 않는다면 "NSGA-II 사용"이라고 쓰지 않고, Pareto/non-dominated concept 배경으로만 제한한다. |
-| R18 | S. Daulton et al., "Differentiable Expected Hypervolume Improvement for Parallel Multi-Objective Bayesian Optimization," NeurIPS, 2020. | arXiv abstract: https://arxiv.org/abs/2006.05078 / PDF: https://arxiv.org/pdf/2006.05078 | Bayesian multi-objective optimization 확장 근거다. | 현재 코드는 MOBO가 아니므로, 실제 구현 전까지는 참고 후보로만 둔다. |
-| R19 | H. Jeong et al., "ML-Driven Optimization of Standard Cell Performance and Timing in Advanced Nodes," JSTS, 2026. | DOI: https://doi.org/10.5573/JSTS.2026.26.2.130 / 색인: https://pure.skku.edu/en/publications/ml-driven-optimization-of-standard-cell-performance-and-timing-in/ | 회로 성능/타이밍 최적화에서 ML surrogate와 multi-objective optimization을 사용하는 최신 배경이다. | 본 프로젝트의 `suggest_active_cases.py`는 ANN/MOBO 구현이 아니므로, 직접 방법론 근거가 아니라 배경/향후 확장으로만 사용한다. |
+| R18 | S. Daulton et al., "Differentiable Expected Hypervolume Improvement for Parallel Multi-Objective Bayesian Optimization," NeurIPS, 2020. | arXiv abstract: https://arxiv.org/abs/2006.05078 / PDF: https://arxiv.org/pdf/2006.05078 | Bayesian multi-objective optimization 확장 근거다. | 현재 코드는 (scalarized utility 기반) single-objective GP-UCB Bayesian optimization이고 R18이 다루는 정식 MOBO(qEHVI)는 아니므로, 실제 MOBO를 구현하기 전까지는 참고 후보로만 둔다. |
+| R19 | H. Jeong et al., "ML-Driven Optimization of Standard Cell Performance and Timing in Advanced Nodes," JSTS, 2026. | DOI: https://doi.org/10.5573/JSTS.2026.26.2.130 / 색인: https://pure.skku.edu/en/publications/ml-driven-optimization-of-standard-cell-performance-and-timing-in/ | 회로 성능/타이밍 최적화에서 ML surrogate와 multi-objective optimization을 사용하는 최신 배경이다. | 본 프로젝트의 `suggest_active_cases.py`는 GP 기반 single-objective Bayesian optimization이며 ANN이나 정식 multi-objective optimization(MOBO) 구현이 아니므로, 직접 방법론 근거가 아니라 배경/향후 확장으로만 사용한다. |
 
 ## 5. TCAD/Sentaurus 공식 자료와 예제 위치
 
@@ -66,7 +66,7 @@
 - "spacer engineering과 circuit delay를 최초로 연결하였다."
 - "robust/variability analysis를 최초로 수행하였다."
 - "SiO2 low-k spacer가 기존에 없던 신공정이다."
-- "ANN/MOBO/NSGA-II 기반 최적화를 구현하였다." 단, 실제 구현 및 검증한 경우는 제외한다.
+- "ANN/MOBO(multi-objective BO)/NSGA-II 기반 최적화를 구현하였다." 단, 실제 구현 및 검증한 경우는 제외한다 (GP 기반 single-objective Bayesian optimization은 실제 구현했으므로 이렇게는 표현 가능).
 - "TCAD 결과를 실제 fabrication 또는 실측 결과로 검증하였다."
 
 권장 표현:
@@ -74,7 +74,7 @@
 - "선행연구의 asymmetric/dual-k spacer FinFET 흐름을 바탕으로, 본 프로젝트는 SOI FinFET seed deck에서 drain-side low-k composite spacer 설계공간을 정의하고 TCAD 기반 device-circuit 평가 및 robust optimum workflow를 구축한다."
 - "구조 자체의 최초성보다, 동일한 평가 흐름에서 `L_sp_S`, `L_sp_D`, `W_low_k`의 trade-off, 회로 성능 feedback, 공정 편차 방어율을 정량화하는 데 초점을 둔다."
 - "Pareto 후보 선정은 회로 성능 지표를 중심으로 하되, Ion/Ioff/DIBL/Cgd는 device-level guardrail과 물리 해석 근거로 사용한다."
-- "제한된 TCAD 실행 예산 안에서 lightweight surrogate-assisted active DOE를 사용하여 추가 후보를 추천하였다."
+- "제한된 TCAD 실행 예산 안에서 GP(Gaussian Process) surrogate와 UCB acquisition을 사용한 lightweight single-objective Bayesian optimization(active DOE)으로 추가 후보를 추천하였다."
 
 ## 7. 현재 프로젝트에서 직접 써야 할 최소 인용 세트
 

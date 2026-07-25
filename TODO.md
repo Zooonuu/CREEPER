@@ -264,8 +264,8 @@ device metric뿐 아니라 FO4 회로 성능과 공정 편차 robust성까지 �
 - [ ] R11 또는 R12를 low-k/hybrid spacer 공정 및 parasitic capacitance reduction 근거로 인용
 - [ ] R16을 LHS/DOE 방법론 근거로 인용
 - [ ] "최초 제안", "최초 연결", "실제 제작 검증", "실측 결과" 표현이 남아 있지 않은지 확인
-- [ ] `suggest_active_cases.py` 구현 범위를 lightweight surrogate-assisted active DOE로 설명
-- [ ] 실제 구현하지 않은 ANN/MOBO/NSGA-II 사용 주장을 제거
+- [ ] `suggest_active_cases.py` 구현 범위를 "GP(Gaussian Process) surrogate + UCB acquisition 기반 single-objective Bayesian optimization"으로 정확히 설명 (여러 지표는 scalarized utility로 결합한 단일 목적함수임을 명시)
+- [ ] 실제 구현하지 않은 ANN/MOBO(multi-objective BO)/NSGA-II 사용 주장을 제거
 - [ ] 논문 figure를 그대로 복제하지 않고 직접 작성한 schematic과 출처 인용만 사용
 - [ ] 유료 논문 PDF와 proprietary Sentaurus deck이 Git에 포함되지 않았는지 확인
 - [ ] TCAD 결과, mock 결과, 실제 측정 결과를 표/그림 caption에서 명확히 구분

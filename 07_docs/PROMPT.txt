@@ -7,10 +7,10 @@
 중요한 연구 흐름:
 1. baseline symmetric Si3N4 spacer SOI FinFET 확보
 2. proposed 구조: source-side 짧은 Si3N4 spacer, drain-side 긴 composite spacer, drain-side 내부 SiO2 low-k 구간
-3. initial DOE 48개 + anchor case 생성
+3. initial DOE 24개 + anchor case 생성
 4. TCAD 소자 결과를 all_results.csv로 정리
 5. device-level screening: Ion maximize, Ioff/DIBL/Cgd minimize
-6. active DOE: lightweight surrogate-assisted active sampling
+6. active DOE: GP(Gaussian Process) surrogate + UCB acquisition 기반 lightweight single-objective Bayesian optimization
 7. 최종 판단은 소자 지표가 아니라 FO4 inverter benchmark의 delay, power, energy, EDP 기준
 8. circuit Pareto 후보를 0.5 nm fabrication grid로 snapping 후 local refinement
 9. ±0.3/±0.5 nm robust validation으로 robust DTCO optimum 선정
@@ -49,7 +49,7 @@
 - project.yaml: 공통 변수, DOE, active DOE, local refinement, robust validation 설정
 - 03_doe/generate_cases.py: initial DOE 생성
 - 03_doe/generate_anchor_cases.py: baseline/center/corner anchor case 생성
-- 03_doe/suggest_active_cases.py: quadratic ridge surrogate + bootstrap uncertainty + Sobol pool 기반 active DOE 후보 추천
+- 03_doe/suggest_active_cases.py: GP(RBF kernel) surrogate + UCB acquisition + Sobol pool 기반 single-objective Bayesian optimization active DOE 후보 추천 (numpy/scipy only, no sklearn)
 - 03_doe/generate_local_refinement_cases.py: circuit Pareto 후보 주변 grid-snapped refinement case 생성
 - 03_doe/generate_robust_cases.py: ±0.3/±0.5 nm variation case 생성
 - 05_results/pareto.py: minimize/maximize 혼합 Pareto 계산
@@ -62,7 +62,7 @@
 - “비대칭 dual-k/composite spacer FinFET 최초 제안”이라고 쓰지 마라.
 - “spacer engineering과 circuit delay를 최초로 연결”했다고 쓰지 마라.
 - “실제 제작/실측 검증”이라고 쓰지 마라.
-- ANN, MOBO, NSGA-II를 실제 구현한 것처럼 쓰지 마라.
+- ANN, MOBO(multi-objective BO), NSGA-II를 실제 구현한 것처럼 쓰지 마라. GP 기반 single-objective Bayesian optimization(active DOE)은 실제 구현했으므로 정확히 그렇게 표현해라.
 - Pal et al. 2015 같은 직접 선행연구와의 중복성을 인정하고, 이 프로젝트의 기여는 workflow와 제한된 TCAD 예산에서의 DTCO/robust validation으로 잡아라.
 - TCAD simulation, mock/test result, actual measurement를 항상 구분해라.
 - 논문 figure, 유료 PDF, proprietary TCAD deck은 커밋하거나 복제하지 마라.

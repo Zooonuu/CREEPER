@@ -55,7 +55,9 @@ SOI FinFET의 drain 쪽 spacer 구조를 바꿔서, 소자 지표가 아니라
   snapping -> robust validation)"와 "그 결과로 얻은 robust한 최적
   설계값" 임.
 - 절대 쓰면 안 되는 표현: "최초로 제안", "최초로 연결", "실제 제작/
-  실측으로 검증", "ANN/MOBO/NSGA-II를 구현했다"(실제 구현 안 했으면)
+  실측으로 검증", "ANN/MOBO(multi-objective BO)/NSGA-II를 구현했다"
+  (실제 구현 안 했으면). 단, GP 기반 single-objective Bayesian
+  optimization(active DOE)은 실제 구현했으므로 이렇게는 표현 가능.
 
 
 ================================================================
@@ -83,10 +85,12 @@ SOI FinFET의 drain 쪽 spacer 구조를 바꿔서, 소자 지표가 아니라
 - 07_docs/              : 참고문헌, 파일 가이드, 이 요약본 등 부가 문서
 
 핵심 스크립트 흐름 (03_doe, 05_results):
-- generate_cases.py              : initial DOE 48개 생성
+- generate_cases.py              : initial DOE 24개 생성
 - generate_anchor_cases.py       : baseline/center/corner 기준점 생성
 - suggest_active_cases.py        : 결과 기반 추가 실행 후보 추천
-                                    (가벼운 surrogate 모델, ANN 아님)
+                                    (GP surrogate + UCB acquisition 기반
+                                    single-objective Bayesian optimization.
+                                    numpy/scipy만으로 구현, ANN 아님)
 - generate_local_refinement_cases.py : 후보를 0.5nm grid로 스냅
 - generate_robust_cases.py       : ±0.3/±0.5nm 공정 편차 case 생성
 - pareto.py                      : Pareto front 계산 (소자용/회로용)
@@ -239,7 +243,7 @@ source=GND, 두 게이트가 공통 입력(IN), 두 드레인이 공통 출력(O
 계획적으로 배치해 탐색하는 방법론.
 
 [LHS, Latin Hypercube Sampling] 설계공간을 고르게 커버하도록 샘플을
-뽑는 통계적 샘플링 기법. 이 프로젝트의 initial DOE 48개 생성에 사용.
+뽑는 통계적 샘플링 기법. 이 프로젝트의 initial DOE 24개 생성에 사용.
 
 [Anchor case] LHS만으로는 놓칠 수 있는 기준점(baseline 대응값, 설계
 공간 중앙, feasible한 극단 코너)을 별도로 추가하는 case.
@@ -249,10 +253,16 @@ source=GND, 두 게이트가 공통 입력(IN), 두 드레인이 공통 출력(O
 포기하지 않고는 다른 쪽을 더 좋게 만들 수 없는 후보들의 집합.
 
 [Surrogate model] 실제(비싼) 시뮬레이션 대신 결과를 빠르게 근사
-예측하는 모델. **주의: 이 프로젝트는 quadratic ridge regression +
-bootstrap 불확실성 추정을 쓰는 lightweight 버전이고, ANN(딥러닝)이나
-정식 Bayesian optimization을 구현한 것이 아님.** 발표/보고서에서
-"AI로 최적화했다"처럼 과장하면 안 됨.
+예측하는 모델. **이 프로젝트는 Gaussian Process(GP, RBF kernel) +
+UCB(Upper Confidence Bound) acquisition을 쓰는 lightweight, 외부
+라이브러리 없이(numpy/scipy만으로) 구현한 single-objective Bayesian
+optimization임.** 단, 여러 device/circuit 지표(Ion, Ioff, DIBL, Cgd
+또는 delay/power/energy/EDP)를 정규화 후 평균 낸 "하나의 scalarized
+utility"에 대해서만 최적화하므로, 정식 multi-objective BO(MOBO,
+예: qEHVI)는 아님. ANN(딥러닝)도 아니고 NSGA-II 같은 유전 알고리즘도
+아님. 발표/보고서에서 "MOBO/NSGA-II/ANN을 구현했다"처럼 과장하면 안
+되지만, "GP 기반 single-objective Bayesian optimization을 구현했다"는
+정확한 표현이므로 그대로 써도 됨.
 
 [Active DOE / Active sampling] 이미 나온 결과를 바탕으로 surrogate
 모델이 "다음에 실행하면 정보가 될 만한" 후보를 추천하는 방식. 예측값과
@@ -292,9 +302,12 @@ A. 아니요. 전부 TCAD(Sentaurus) 시뮬레이션 결과이며, 실제 제작
    실측 검증은 하지 않았습니다/할 계획이 없습니다.
 
 Q. AI로 최적화한 건가요?
-A. Lightweight surrogate(quadratic ridge + bootstrap uncertainty)를
-   사용한 active sampling이며, ANN이나 정식 Bayesian/유전 알고리즘
-   최적화(MOBO, NSGA-II)를 구현한 것은 아닙니다.
+A. GP(Gaussian Process) surrogate + UCB acquisition을 사용한
+   single-objective Bayesian optimization(active DOE)을 numpy/scipy만
+   으로 직접 구현해서 사용했습니다. 다만 여러 지표를 하나의 scalarized
+   utility로 합쳐 최적화하는 방식이라 정식 multi-objective BO(MOBO)는
+   아니고, ANN(딥러닝)이나 유전 알고리즘(NSGA-II)도 구현하지
+   않았습니다.
 
 Q. Cgd가 줄면 무조건 회로가 빨라지나요?
 A. 아니요, 그래서 이 프로젝트가 소자 지표만으로 결론 내지 않고 반드시

@@ -16,7 +16,7 @@ def main() -> None:
 
     doe_cfg = cfg.get("doe", {})
     parser = argparse.ArgumentParser()
-    parser.add_argument("--samples", type=int, default=doe_cfg.get("initial_samples", 48))
+    parser.add_argument("--samples", type=int, default=doe_cfg.get("initial_samples", 24))
     parser.add_argument("--method", choices=["lhs", "sobol"], default=doe_cfg.get("method", "lhs"))
     parser.add_argument("--seed", type=int, default=doe_cfg.get("seed", 20260723))
     parser.add_argument(
