@@ -1,6 +1,6 @@
 # TODO
 
-이 문서는 프로젝트 전체 진행을 **공정/소자설계 파트**와 **회로설계 파트**로 나누어 정리한다.
+이 문서는 프로젝트 전체 진행을 **일정 캘린더(0절)에 맞춘 주차별 순서**로 정리한다. 실제 작업은 혼자 진행하고, 매 TCAD 세션 시작 시 이 문서 기준으로 어디까지 했는지/다음에 뭘 할지 확인하고 진행한다.
 
 전체 목표:
 
@@ -24,61 +24,50 @@ SOI FinFET에서 drain-side low-k composite spacer 구조를 설계하고,
 
 ---
 
-## 1. 전체 진행표: 소자 / 회로 분담
+## 0. 일정 캘린더 (2026-07-25 ~ 2026-08-31)
 
-| 단계 | 공정/소자설계 파트 | 회로설계 파트 | 두 파트 연결 산출물 |
-|---|---|---|---|
-| 1. 환경 확인 | TCAD 로그인, Sentaurus/Silvaco 실행 확인, 원본 FinFET example 실행, 결과 파일 복사 테스트, repo 이동 확인 | MixedMode/회로 예제 확인, inverter/FO4 template 확인, 회로 실행 가능 여부 확인 | TCAD 실행 가능 여부, tool/version, 원본 example 경로, 결과 회수 방법 |
-| 2. Baseline 소자 | 대칭 Si3N4 spacer SOI FinFET 구현, NMOS/PMOS Id-Vg/Id-Vd 수렴, Ion/Ioff/Vth/SS/DIBL/Cgd 추출 | baseline NMOS/PMOS를 inverter에 연결하기 위한 입력 파일/컬럼 정리, unit inverter 연결 규칙 정리 | baseline NMOS/PMOS 결과 파일, baseline metric CSV |
-| 3. Proposed 소자 | `L_sp_S`, `L_sp_D`, `W_low_k` 적용, drain-side low-k composite spacer 구현, baseline 대비 device metric 비교 | proposed device의 drain-side composite spacer가 OUT 쪽을 향하도록 회로 연결 방향 정리 | proposed NMOS/PMOS 결과 파일, source/drain 방향 정보 |
-| 4. DOE 실행 | initial DOE 48개, anchor case 생성/실행, 실패 case 기록, `all_results.csv` 정리 | DOE 결과를 회로 후보로 넘길 수 있도록 case_id/파일명/변수값 표준화 | DOE 결과 CSV, 실패 case 목록 |
-| 5. Device screening | Ion/Ioff/SS/DIBL/Cgd 기준 Pareto 계산, active DOE 후보 추천, 회로 검증 후보 3~5개 선정 | 후보 3~5개에 대한 회로 실행 조건 준비: VDD, input pulse, transient time, load, 측정 기준 | 회로 검증 후보 목록 |
-| 6. 회로 DTCO | 후보별 NMOS/PMOS 파일 제공, 소자 방향/source-drain 방향 검토 | unit inverter VTC, FO4 transient, tpHL/tpLH, delay, power, energy, EDP 추출, circuit Pareto 계산 | circuit-level 결과 CSV, FO4 waveform, circuit Pareto |
-| 7. Local refinement | circuit Pareto 후보 주변 0.5 nm grid-snapped case 생성/실행 | local refinement 후보의 FO4 재평가, circuit Pareto 업데이트 | grid-snapped 최종 후보 |
-| 8. Robust validation | 최종 후보 주변 ±0.3/±0.5 nm variation case 생성/실행, Ion/Cgd 유지율 계산 | robust case의 FO4 delay/EDP 열화율 계산, nominal vs robust optimum 비교 | robust summary table, robust optimum |
-| 9. 최종 정리 | 구조도, 공정 흐름도, Id-Vg, device metric, DOE/Pareto 결과 정리 | FO4 회로도, waveform, delay/power/energy/EDP 그래프 정리 | 발표자료, 보고서, 포스터, 예상 질문 답변 |
+평일 = 학교 TCAD PC 실행, 주말 = 결과 정리 및 보고서/발표자료 준비. 확인된 TCAD 툴은 Synopsys Sentaurus(SWB, sprocess/sdevice)다. 진행이 늦어지면 6절 "최소 성공 기준"으로 범위를 축소한다. 각 항목의 상세 체크리스트는 1절의 같은 주차 번호를 참고한다.
+
+- [ ] 2026-07-25(토)~07-26(일) — Week0: 준비
+- [ ] 2026-07-27(월)~07-31(금) — Week1: 환경 확인 + baseline 구조/지표 확보
+- [ ] 2026-08-01(토)~08-02(일) — Weekend1: baseline 결과 정리, 보고서 배경/선행연구 초안
+- [ ] 2026-08-03(월)~08-07(금) — Week2: proposed 구현 + initial DOE/anchor 생성 및 실행 착수
+- [ ] 2026-08-08(토)~08-09(일) — Weekend2: all_results.csv 누적 정리, baseline vs proposed 비교, 회로 조건 사전 확정
+- [ ] 2026-08-10(월)~08-14(금) — Week3: DOE 실행 마무리 + device screening + 회로 실행 환경 확인
+- [ ] 2026-08-15(토)~08-16(일) — Weekend3: device Pareto 정리, 회로 검증 후보 확정, 보고서 소자 섹션
+- [ ] 2026-08-17(월)~08-21(금) — Week4: unit inverter + FO4 회로 DTCO 실행
+- [ ] 2026-08-22(토)~08-23(일) — Weekend4: circuit Pareto 정리, 최종 후보 압축, 보고서 회로 섹션
+- [ ] 2026-08-24(월)~08-28(금) — Week5: local refinement + robust validation 실행
+- [ ] 2026-08-29(토)~08-30(일) — Weekend5: robust summary 정리, nominal vs robust 최종 스토리
+- [ ] 2026-08-31(월) — 마감: 최종 그림/표/표현 검토, 제출물 마무리
 
 ---
 
-## 2. 공정/소자설계 파트 진행 과정
+## 1. 주차별 상세 체크리스트
 
-이 파트의 목표:
+### Week0 (07-25~07-26, 주말/준비)
 
-```text
-좋아 보이는 소자를 만든다.
-즉 baseline 대비 Cgd, DIBL, SS, Ioff를 줄이면서 Ion 손실을 관리한다.
-```
+- [ ] `project.yaml`의 `fixed` 값 확정: `gate_length_nm`, `fin_height_nm`, `fin_width_nm`, `eot_nm`, `vdd_V`
+- [ ] `fabrication_grid.step_nm` 확정
+- [ ] `baseline_sprocess`, `proposed_sprocess`, `inverter`, `fo4_inverter_benchmark` template 내용 재검토
+- [ ] 노트북 ↔ 학교 PC repo 동기화 절차 점검 (`git clone`/`git pull` 가능 여부)
 
-### 2.1 환경 및 원본 example
+### Week1 (07-27~07-31, 평일): 환경 확인 + Baseline
+
+환경 확인:
 
 - [ ] 학교 TCAD PC 로그인
-- [ ] Sentaurus/Silvaco 실행 환경 로드 방법 기록
-- [ ] Sentaurus Process 또는 공정 시뮬레이터 실행 확인
-- [ ] Sentaurus Device 또는 소자 시뮬레이터 실행 확인
-- [ ] Sentaurus Visual/Inspect 또는 결과 viewer 실행 확인
+- [ ] Sentaurus 실행 환경 로드 방법 기록
+- [ ] Sentaurus Process(sprocess) 실행 확인
+- [ ] Sentaurus Device(sdevice) 실행 확인
+- [ ] Sentaurus Visual/Inspect 실행 확인
 - [ ] 실행 가능한 3D FinFET example 확보
 - [ ] 원본 example을 수정하지 않고 1회 실행
 - [ ] structure/mesh/Id-Vg 결과 확인
 - [ ] 결과 파일 USB/외장 SSD로 복사 테스트
 - [ ] 우리 repo를 TCAD PC로 복사 또는 `git clone` 가능 여부 확인
 
-산출물:
-
-- [ ] 원본 example 경로
-- [ ] TCAD tool/version
-- [ ] 실행 명령어 또는 GUI 실행 순서
-- [ ] 실행 성공 스크린샷
-- [ ] 결과 회수 방법
-
-### 2.2 Baseline SOI FinFET
-
-Baseline 정의:
-
-```text
-Source spacer = Si3N4
-Drain spacer = Si3N4
-양쪽 spacer 길이 동일
-```
+Baseline (대칭 Si3N4 spacer, source/drain 동일 길이):
 
 - [ ] 원본 FinFET example을 baseline 작업 폴더로 복사
 - [ ] substrate/BOX/fin/gate/spacer/source/drain/contact 구조 확인
@@ -91,29 +80,16 @@ Drain spacer = Si3N4
 - [ ] Ion, Ioff, Vth, SS, DIBL, Cgd 추출
 - [ ] baseline 구조와 지표 동결
 
-산출물:
+산출물: 원본 example 경로, TCAD tool/version, 실행 순서, 실행 성공 스크린샷, 결과 회수 방법, baseline structure 그림, baseline Id-Vg/Id-Vd 그래프, baseline metric CSV
 
-- [ ] baseline structure 그림
-- [ ] baseline Id-Vg/Id-Vd 그래프
-- [ ] baseline metric CSV
+### Weekend1 (08-01~08-02): 정리
 
-### 2.3 Proposed SOI FinFET
+- [ ] baseline 결과 정리 (구조 그림, Id-Vg/Id-Vd 그래프, metric CSV)
+- [ ] 보고서 배경/선행연구(R01 Pal et al. 등) 섹션 초안
 
-Proposed 정의:
+### Week2 (08-03~08-07, 평일): Proposed + DOE 착수
 
-```text
-Source-side spacer = 짧은 Si3N4
-Drain-side spacer = 긴 composite spacer
-Drain-side spacer 내부 = SiO2 low-k 구간
-```
-
-설계 변수:
-
-```text
-L_sp_S  = source-side spacer 길이
-L_sp_D  = drain-side spacer 길이
-W_low_k = drain-side SiO2 low-k 구간 길이
-```
+Proposed (source-side 짧은 Si3N4 + drain-side 긴 composite spacer + 내부 SiO2 low-k):
 
 - [ ] source-side 짧은 Si3N4 spacer 구현
 - [ ] drain-side 긴 spacer 구현
@@ -126,211 +102,119 @@ W_low_k = drain-side SiO2 low-k 구간 길이
 - [ ] Ion, Ioff, Vth, SS, DIBL, Cgd 비교
 - [ ] electric field, current density, Cgd 변화 확인
 
-산출물:
-
-- [ ] proposed structure 그림
-- [ ] baseline vs proposed 비교표
-- [ ] Id-Vg/Id-Vd 비교 그래프
-- [ ] Cgd/Ion/DIBL 변화율
-
-### 2.4 DOE 및 Device Screening
+DOE 착수:
 
 - [ ] `project.yaml`의 설계공간 확정
-- [ ] `fabrication_grid.step_nm` 확정
 - [ ] `python3 03_doe/generate_cases.py`로 initial DOE case 생성
 - [ ] `python3 03_doe/generate_anchor_cases.py`로 anchor case 생성
 - [ ] baseline, center, feasible corner 우선 실행
-- [ ] DOE case 실행
+- [ ] DOE case 실행 시작
+
+산출물: proposed structure 그림, baseline vs proposed 비교표, Id-Vg/Id-Vd 비교 그래프, Cgd/Ion/DIBL 변화율, `03_doe/cases/initial_doe_cases.csv`, `03_doe/cases/anchor_cases.csv`
+
+### Weekend2 (08-08~08-09): 정리 + 회로 조건 사전 확정
+
+- [ ] 그 주까지의 결과를 `05_results/summary/all_results.csv`로 누적 정리
 - [ ] 실패 case와 원인 기록
-- [ ] 모든 결과를 `05_results/summary/all_results.csv` 형태로 정리
+- [ ] baseline vs proposed 비교표 업데이트
+- [ ] `04_circuit/inverter/inverter.cmd.template`, `04_circuit/fo4/fo4_inverter_benchmark.cmd.template` 내용 확인
+- [ ] unit inverter 구성 정리, FO4 구성 정리: `IN -> INV_driver -> INV_DUT -> INV_load_4x`
+- [ ] VDD, temperature, input pulse rise/fall/time period, transient simulation time, load 조건 확정
+- [ ] tpHL/tpLH, output slew, average power, energy per transition, EDP 측정/계산 기준 확정
+- [ ] 회로 결과 CSV 템플릿 작성
+
+산출물: 회로 측정 기준 문서, delay/power/energy/EDP 계산식, 회로 결과 CSV 템플릿
+
+### Week3 (08-10~08-14, 평일): DOE 마무리 + Device Screening + 회로 환경 확인
+
+- [ ] 남은 DOE case 실행 완료
+- [ ] 실패 case와 원인 기록
+- [ ] 모든 결과를 `05_results/summary/all_results.csv`로 정리
 - [ ] device screening 목적함수 확정: maximize Ion, minimize Ioff/DIBL/Cgd
 - [ ] `python3 05_results/pareto.py`로 device Pareto 계산
 - [ ] Cgd-Ion trade-off 확인
 - [ ] `python3 03_doe/suggest_active_cases.py --mode device_screening`으로 active DOE 후보 추천
 - [ ] 회로 검증 후보 3~5개 선정
+- [ ] MixedMode 또는 회로 시뮬레이션 사용 가능 여부 확인 (TCAD PC에서)
 
-산출물:
+산출물: `05_results/summary/all_results.csv`, 실패 case 목록, device Pareto plot, Cgd vs Ion trade-off 그래프, 회로 검증 후보 3~5개 목록
 
-- [ ] `03_doe/cases/initial_doe_cases.csv`
-- [ ] `03_doe/cases/anchor_cases.csv`
-- [ ] `05_results/summary/all_results.csv`
-- [ ] 실패 case 목록
-- [ ] device Pareto plot
-- [ ] Cgd vs Ion trade-off 그래프
-- [ ] 회로 검증 후보 3~5개 목록
+### Weekend3 (08-15~08-16): 정리
 
-### 2.5 Local Refinement 및 Robust Case
+- [ ] device Pareto plot, Cgd-Ion trade-off 그래프 최종 정리
+- [ ] 회로 검증 후보 3~5개 CSV 확정 (case_id, `L_sp_S`/`L_sp_D`/`W_low_k`, NMOS/PMOS 파일, Ion/Ioff/Vth/SS/DIBL/Cgd, source/drain 방향 — 2절 스키마 참고)
+- [ ] 보고서 소자 섹션 작성
 
-- [ ] 회로 DTCO 결과를 받아 최종 후보 1~2개 선정
-- [ ] `python3 03_doe/generate_local_refinement_cases.py`로 grid-snapped case 생성
-- [ ] local refinement case 실행
-- [ ] local refinement 결과를 `all_results.csv`에 병합
-- [ ] `python3 03_doe/generate_robust_cases.py`로 robust case 생성
-- [ ] 최종 후보 주변 ±0.3/±0.5 nm variation case 실행
-- [ ] robust result CSV 작성
-- [ ] Ion 유지율, Cgd 개선 유지율 계산
+### Week4 (08-17~08-21, 평일): 회로 DTCO
 
-산출물:
+Baseline 회로 sanity check:
 
-- [ ] local refinement case list
-- [ ] grid-snapped 최종 후보
-- [ ] robust case list
-- [ ] robust 소자 결과 CSV
-
----
-
-## 3. 회로설계 파트 진행 과정
-
-이 파트의 목표:
-
-```text
-소자에서 좋아 보이는 후보가 실제 inverter/FO4 회로에서도 좋은지 판정한다.
-즉 Cgd 감소가 delay, power, energy, EDP 개선으로 이어지는지 확인한다.
-```
-
-### 3.1 회로 환경 및 benchmark 준비
-
-- [ ] MixedMode 또는 회로 시뮬레이션 사용 가능 여부 확인
-- [ ] 회로 예제 또는 TCAD-to-circuit 예제 위치 확인
-- [ ] `04_circuit/inverter/inverter.cmd.template` 내용 확인
-- [ ] `04_circuit/fo4/fo4_inverter_benchmark.cmd.template` 내용 확인
-- [ ] unit inverter 구성 정리
-- [ ] FO4 구성 정리: `IN -> INV_driver -> INV_DUT -> INV_load_4x`
-- [ ] 회로 결과 CSV 템플릿 작성
-
-산출물:
-
-- [ ] unit inverter 연결 그림
-- [ ] FO4 benchmark 그림
-- [ ] 회로 결과 CSV 템플릿
-
-### 3.2 회로 입력 조건 고정
-
-- [ ] VDD 확정
-- [ ] temperature 확정
-- [ ] input pulse rise/fall/time period 조건 확정
-- [ ] transient simulation time 확정
-- [ ] load 조건 확정
-- [ ] tpHL/tpLH 측정 기준 확정
-- [ ] output slew 측정 기준 확정
-- [ ] average power 계산 구간 확정
-- [ ] energy per transition 계산식 확정
-- [ ] EDP 계산식 확정
-
-산출물:
-
-- [ ] 회로 측정 기준 문서 또는 표
-- [ ] delay/power/energy/EDP 계산식
-
-### 3.3 Baseline 회로 sanity check
-
-- [ ] baseline NMOS/PMOS 결과 파일 수령
-- [ ] PMOS source = VDD, NMOS source = GND 연결 확인
-- [ ] PMOS/NMOS gate = IN 연결 확인
-- [ ] PMOS/NMOS drain = OUT 연결 확인
-- [ ] unit inverter VTC 실행
-- [ ] switching 정상 여부 확인
+- [ ] PMOS source = VDD, NMOS source = GND / PMOS·NMOS gate = IN / PMOS·NMOS drain = OUT 연결 확인
+- [ ] unit inverter VTC 실행, switching 정상 여부 확인
 - [ ] baseline FO4 transient 실행
 - [ ] baseline tpHL/tpLH/delay/power/energy/EDP 추출
 
-산출물:
+Proposed 후보 회로 검증 (drain-side composite spacer는 반드시 switching output node, 즉 OUT 쪽을 향하게 배치):
 
-- [ ] baseline inverter VTC
-- [ ] baseline FO4 waveform
-- [ ] baseline 회로 metric CSV
+- [ ] 후보별 NMOS/PMOS 파일·source/drain 방향 확인
+- [ ] unit inverter VTC 실행, 정상 switching 후보만 FO4로 이동
+- [ ] FO4 transient 실행 → tpHL/tpLH, FO4 delay, output slew, average power, energy per transition, EDP 추출
+- [ ] `python3 05_results/pareto.py`(circuit_dtco)로 circuit Pareto 계산
+- [ ] 필요시 `python3 03_doe/suggest_active_cases.py --mode circuit_dtco`로 추가 후보 추천
 
-### 3.4 Proposed 후보 회로 검증
+산출물: baseline/후보별 inverter VTC, FO4 waveform, delay/power/energy/EDP 표, circuit Pareto plot
 
-중요 규칙:
+### Weekend4 (08-22~08-23): 정리
 
-```text
-Proposed device의 drain-side composite spacer는 switching output node, 즉 OUT 쪽을 향해야 한다.
-```
+- [ ] circuit Pareto plot 정리, 회로 기준 최종 후보 1~2개 압축
+- [ ] 보고서 회로 섹션 작성
 
-- [ ] 소자 파트에서 회로 검증 후보 3~5개 수령
-- [ ] 후보별 NMOS/PMOS 파일 존재 여부 확인
-- [ ] 후보별 source/drain 방향 확인
-- [ ] unit inverter VTC 실행
-- [ ] 정상 switching 후보만 FO4로 이동
-- [ ] FO4 transient 실행
-- [ ] tpHL/tpLH 추출
-- [ ] FO4 delay 계산
-- [ ] output slew 추출
-- [ ] average power 추출
-- [ ] energy per transition 추출
-- [ ] EDP 계산
-- [ ] circuit Pareto 계산
+### Week5 (08-24~08-28, 평일): Local Refinement + Robust Validation
 
-산출물:
+- [ ] 회로 DTCO 결과 기준 최종 후보 1~2개 선정
+- [ ] `python3 03_doe/generate_local_refinement_cases.py`로 grid-snapped case 생성/실행
+- [ ] local refinement 결과를 `all_results.csv`에 병합, FO4 재평가, circuit Pareto 업데이트
+- [ ] `python3 03_doe/generate_robust_cases.py`로 ±0.3/±0.5 nm variation case 생성/실행
+- [ ] robust result CSV 작성, Ion 유지율/Cgd 개선 유지율 계산
+- [ ] robust case의 FO4 delay/EDP 열화율 계산, nominal optimum과 robust optimum 비교
 
-- [ ] 후보별 inverter VTC
-- [ ] 후보별 FO4 waveform
-- [ ] delay/power/energy/EDP 표
-- [ ] circuit Pareto plot
-- [ ] 회로 기준 최종 후보 1~2개
+산출물: grid-snapped 최종 후보, robust 소자/회로 결과 CSV, robust summary table
 
-### 3.5 Local Refinement 및 Robust 회로 검증
+### Weekend5 (08-29~08-30): 정리
 
-- [ ] 소자 파트에서 local refinement 후보 결과 수령
-- [ ] local refinement 후보 FO4 재평가
-- [ ] circuit Pareto 업데이트
-- [ ] 소자 파트에서 robust case 결과 수령
-- [ ] robust case의 FO4 delay/EDP 열화율 계산
-- [ ] nominal optimum과 robust optimum 비교
+- [ ] robust summary table/plot 최종 정리
+- [ ] nominal vs robust 최종 스토리 정리
 
-산출물:
+### 마감일 (08-31): 최종 정리
 
-- [ ] local refinement 회로 결과 CSV
-- [ ] robust 회로 결과 CSV
-- [ ] robust summary table
-- [ ] 최종 회로 결론
+- [ ] 3절(최종 제출물), 4절(연구윤리) 체크리스트 전체 확인
+- [ ] 보고서/포스터/발표자료 최종본
 
 ---
 
-## 4. 두 파트 사이 데이터 전달 규칙
+## 2. 결과 CSV 스키마
 
-### 소자 파트 → 회로 파트
+소자 결과 → 회로 입력:
 
 ```csv
 case_id,structure,l_sp_s_nm,l_sp_d_nm,w_low_k_nm,nmos_file,pmos_file,ion_A,ioff_A,vth_V,ss_mV_dec,dibl_mV_V,cgd_F,vdd_V,temperature_K,drain_direction,status,note
 ```
 
-필수 전달 내용:
+필수 항목: case_id / structure(baseline·proposed·doe·local_refinement·robust) / `L_sp_S`·`L_sp_D`·`W_low_k` / NMOS·PMOS 결과 파일 / Ion·Ioff·Vth·SS·DIBL·Cgd / source-drain 방향 / VDD·temperature / 수렴 여부와 warning
 
-- [ ] case_id
-- [ ] structure: baseline/proposed/doe/local_refinement/robust
-- [ ] `L_sp_S`, `L_sp_D`, `W_low_k`
-- [ ] NMOS 결과 파일
-- [ ] PMOS 결과 파일
-- [ ] Ion, Ioff, Vth, SS, DIBL, Cgd
-- [ ] source/drain 방향
-- [ ] VDD, temperature
-- [ ] 수렴 여부와 warning
-
-### 회로 파트 → 소자 파트
+회로 결과:
 
 ```csv
 case_id,unit_inverter_ok,tpHL_s,tpLH_s,fo4_delay_s,output_slew_s,average_power_W,energy_per_transition_J,edp_Js,status,note
 ```
 
-필수 전달 내용:
-
-- [ ] unit inverter 정상 switching 여부
-- [ ] tpHL
-- [ ] tpLH
-- [ ] FO4 delay
-- [ ] output slew
-- [ ] average power
-- [ ] energy per transition
-- [ ] EDP
-- [ ] 회로 수렴 여부와 실패 원인
-- [ ] waveform 파일
+필수 항목: unit inverter 정상 switching 여부 / tpHL / tpLH / FO4 delay / output slew / average power / energy per transition / EDP / 회로 수렴 여부와 실패 원인 / waveform 파일
 
 ---
 
-## 5. 최종 제출물
+## 3. 최종 제출물
 
-### 소자 중심 그림/표
+소자 중심 그림/표:
 
 - [ ] baseline/proposed 3D 구조 비교
 - [ ] 공정 흐름도
@@ -341,7 +225,7 @@ case_id,unit_inverter_ok,tpHL_s,tpLH_s,fo4_delay_s,output_slew_s,average_power_W
 - [ ] device Pareto plot
 - [ ] Cgd-Ion trade-off 그래프
 
-### 회로 중심 그림/표
+회로 중심 그림/표:
 
 - [ ] unit inverter schematic
 - [ ] FO4 benchmark schematic
@@ -351,7 +235,7 @@ case_id,unit_inverter_ok,tpHL_s,tpLH_s,fo4_delay_s,output_slew_s,average_power_W
 - [ ] circuit Pareto plot
 - [ ] robust EDP degradation plot
 
-### 공통 문서
+공통 문서:
 
 - [ ] 선행연구 비교표
 - [ ] 연구윤리/표절 방지 문장
@@ -370,7 +254,7 @@ device metric뿐 아니라 FO4 회로 성능과 공정 편차 robust성까지 �
 
 ---
 
-## 6. 연구윤리 및 표절 방지
+## 4. 연구윤리 및 표절 방지
 
 - [ ] R01 Pal et al. 2015를 asymmetric dual-spacer/device-circuit codesign 직접 선행연구로 본문에 인용
 - [ ] R03 또는 R05를 spacer capacitance와 inverter delay 연결 근거로 인용
@@ -381,16 +265,17 @@ device metric뿐 아니라 FO4 회로 성능과 공정 편차 robust성까지 �
 - [ ] `suggest_active_cases.py` 구현 범위를 lightweight surrogate-assisted active DOE로 설명
 - [ ] 실제 구현하지 않은 ANN/MOBO/NSGA-II 사용 주장을 제거
 - [ ] 논문 figure를 그대로 복제하지 않고 직접 작성한 schematic과 출처 인용만 사용
-- [ ] 유료 논문 PDF와 proprietary Sentaurus/Silvaco deck이 Git에 포함되지 않았는지 확인
+- [ ] 유료 논문 PDF와 proprietary Sentaurus deck이 Git에 포함되지 않았는지 확인
 - [ ] TCAD 결과, mock 결과, 실제 측정 결과를 표/그림 caption에서 명확히 구분
 
 ---
 
-## 7. Codex에 다시 물어볼 때 쓰는 양식
+## 5. 세션 진행 시 알려줄 정보 양식
+
+매 TCAD 세션 시작 시 Claude가 먼저 이 문서(0절 캘린더, 1절 주차별 체크리스트) 기준으로 진행 상황과 다음 할 일을 제시한다. 다음 정보를 화면 캡처/로그와 함께 주면 바로 진행할 수 있다:
 
 ```text
-현재 파트: 공정/소자설계 또는 회로설계
-현재 단계:
+현재 주차 (0절 기준):
 내가 하려는 작업:
 현재 가진 파일/결과:
 막힌 부분:
@@ -401,7 +286,6 @@ TCAD 실행 1건마다 기록할 내용:
 
 ```text
 날짜:
-실행자:
 case_id:
 structure: baseline / proposed / doe / fo4 / robust
 사용 deck:
@@ -417,7 +301,7 @@ structure: baseline / proposed / doe / fo4 / robust
 다음에 확인할 점:
 ```
 
-Codex에 에러를 물어볼 때 붙여 넣을 최소 정보:
+에러를 물어볼 때 붙여 넣을 최소 정보:
 
 - [ ] 실행한 deck 파일 또는 수정한 부분
 - [ ] terminal/log의 마지막 50~100줄
@@ -427,7 +311,7 @@ Codex에 에러를 물어볼 때 붙여 넣을 최소 정보:
 
 ---
 
-## 8. 최소 성공 기준
+## 6. 최소 성공 기준
 
 - [ ] 환경 확인: 원본 example 1회 실행
 - [ ] Baseline: baseline NMOS Id-Vg 확보
