@@ -1,6 +1,6 @@
 # FO4 inverter benchmark template
 #
-# Primary circuit-level validation target for OASIS-FinFET.
+# Primary circuit-level validation target for KUFET.
 # Build a driver inverter, the DUT inverter, and a 4x load inverter.
 # Measure delay at the DUT output while the DUT drives the 4x load input.
 # Each proposed device must orient its drain-side composite spacer toward
