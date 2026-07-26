@@ -1,5 +1,5 @@
 project:
-  name: OASIS-FinFET
+  name: KUFET
   device: SOI_single_fin_FinFET
   method: surrogate_assisted_fabrication_aware_tcad_dtco
   short_title: Surrogate-Assisted TCAD DTCO of an Asymmetric Low-k Spacer

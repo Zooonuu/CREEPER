@@ -1,4 +1,4 @@
-# OASIS-FinFET 핵심 참고문헌 링크 요약
+# KUFET 핵심 참고문헌 링크 요약
 
 이 파일은 보고서/발표 작성과 연구윤리 확인을 위해 실제로 열어볼 핵심 출처만 따로 정리한 요약본이다. 기존 `references.bib`, `REFERENCES.md`, `SOURCE_MAPPING.csv`를 대체하지 않고, 빠른 확인용 링크 맵으로 사용한다.
 
