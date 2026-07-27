@@ -47,3 +47,13 @@ scratch/
 ~$*
 .DS_Store
 Thumbs.db
+
+# LaTeX build artifacts (report.pdf itself is intentionally tracked)
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.xdv

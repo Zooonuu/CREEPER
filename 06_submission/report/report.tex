@@ -1,0 +1,257 @@
+% ============================================================================
+% KUFET Result Report - LaTeX skeleton (IEEEtran + kotex)
+%
+% Compile:
+%   xelatex report.tex
+%   bibtex report            (or: biber report, if you switch to biblatex)
+%   xelatex report.tex
+%   xelatex report.tex
+%
+% Requires (Ubuntu/Debian): sudo apt install texlive-full texlive-lang-cjk fonts-nanum
+% (texlive-full is heavy; texlive-xetex + texlive-lang-cjk + fonts-nanum is enough)
+% If no LaTeX environment is available locally, this file also compiles as-is
+% on Overleaf (Overleaf's default engine can be switched to XeLaTeX in the
+% project settings; kotex is available on Overleaf's TeX Live mirror).
+%
+% Bibliography source: this file intentionally points at 07_docs/references.bib
+% (repo-root, single source of truth) instead of duplicating entries here.
+%
+% Section-to-schedule mapping (see TODO.md for the authoritative calendar):
+%   III/IV (device structure, DOE/algorithm)  -> fillable from Week1
+%   V  (device-level results)                 -> Weekend1/Weekend3
+%   VI (circuit-level DTCO results)            -> Weekend4
+%   VII (robust validation / yield-like)       -> Weekend5
+%   VIII/IX (discussion, conclusion)           -> 08-31 마감
+% Do not fill data-dependent sections with placeholder/mock numbers presented
+% as real results -- leave the [MISSING] markers until actual TCAD/circuit
+% results exist in 05_results/summary/.
+% ============================================================================
+
+\documentclass[journal]{IEEEtran}
+
+\usepackage{fontspec}
+\usepackage{kotex}          % Hangul support under XeLaTeX; auto-detects an installed Korean font
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{xcolor}
+
+% Visual marker for sections/values not yet backed by real results.
+\newcommand{\missing}[1]{\textcolor{red}{\textit{[MISSING -- #1]}}}
+
+\begin{document}
+
+\title{Surrogate-Assisted TCAD DTCO of a Fabrication-Aware Asymmetric \\
+Low-k Composite Spacer in SOI FinFETs}
+
+% TODO: 실제 이름/소속/과목명으로 수정
+\author{Jun~Woo~Heo
+\thanks{Manuscript prepared as a capstone/research result report. Draft version -- \today.}}
+
+\markboth{KUFET Result Report}{}
+
+\maketitle
+
+\begin{abstract}
+\missing{Weekend5 이후, 전체 결과가 확정된 뒤 마지막에 작성}
+본 초록은 문제 정의(대칭 Si3N4 spacer SOI FinFET의 drain-side parasitic capacitance/DIBL/leakage 문제), 제안 구조(source-side 짧은 Si3N4 + drain-side low-k composite spacer), 방법론(TCAD-Aware Fabrication-Constrained Active DOE, GP-UCB 기반 single-objective Bayesian optimization), 핵심 결과(device screening, circuit-level FO4 DTCO Pareto, robust validation), 결론을 150--250 단어로 요약한다. 실제 수치는 로그(수치 결과)가 확보된 뒤에만 채운다.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Asymmetric spacer, SOI FinFET, low-k composite spacer, device-circuit codesign, TCAD, DTCO, Gaussian process, Bayesian optimization, robust design, fabrication-aware design.
+\end{IEEEkeywords}
+
+% ============================================================================
+\section{Introduction}
+\label{sec:intro}
+
+\missing{Week1 이후 초안 가능, Weekend1에 배경/선행연구와 함께 정리}
+
+Baseline 소자는 source/drain 양쪽에 동일한 Si$_3$N$_4$ spacer를 갖는 대칭 구조의 3D SOI FinFET이다. 본 프로젝트는 source-side spacer는 짧게 유지하고, drain-side spacer는 길이를 늘리면서 내부에 SiO$_2$ low-k 구간을 삽입하는 비대칭 composite spacer 구조를 제안한다. 목표는 drain 측 fringe/Miller capacitance($C_{gd}$), 전계 집중, DIBL, leakage를 완화하면서 source 측 구동전류 손실을 최소화하고, 최종적으로 FO4 inverter benchmark 기준 delay/power/energy/EDP를 개선하는 것이다.
+
+본 프로젝트의 방법론적 기여는 제한된 TCAD 실행 예산 안에서 설계공간을 탐색하기 위한 \emph{TCAD-Aware Fabrication-Constrained Active DOE} 흐름이다: 초기 Latin Hypercube Sampling(LHS) 기반 DOE + anchor case $\rightarrow$ device-level screening $\rightarrow$ Gaussian Process(GP, RBF kernel) surrogate 기반 UCB(Upper Confidence Bound) acquisition을 사용한 single-objective Bayesian optimization으로 active DOE 후보 추천 $\rightarrow$ fabrication-grid snapping $\rightarrow$ circuit-level FO4 Pareto $\rightarrow$ $\pm$0.3/$\pm$0.5~nm robust validation. 최종 판단 기준은 소자 지표가 아니라 FO4 inverter benchmark의 회로 지표이며, 최종 후보는 nominal optimum이 아니라 robust DTCO optimum으로 선정한다.
+
+본 논문(보고서)의 구성은 다음과 같다. \mbox{Section~\ref{sec:related}}는 직접 중복 선행연구와 본 프로젝트의 기여 경계를 정리한다. \mbox{Section~\ref{sec:device}}는 baseline/proposed 소자 구조와 설계 변수를 설명한다. \mbox{Section~\ref{sec:doe}}는 active DOE 알고리즘을 설명한다. \mbox{Section~\ref{sec:device-results}}, \mbox{\ref{sec:circuit-results}}, \mbox{\ref{sec:robust}}는 각각 소자, 회로, robust validation 결과를 제시한다. \mbox{Section~\ref{sec:discussion}}은 해석과 한계를, \mbox{Section~\ref{sec:conclusion}}은 결론을 다룬다.
+
+% ============================================================================
+\section{Related Work}
+\label{sec:related}
+
+\missing{Weekend1에 초안 작성}
+
+% 연구윤리 가드레일 (07_docs/REFERENCE_LINKS_SUMMARY.md, README.md 참고):
+%  - R01(Pal et al. 2015, TED)은 asymmetric dual-spacer + device-circuit codesign + variability의
+%    직접 중복 선행연구이므로 반드시 본문에서 인용하고, 구조 자체의 최초성을 주장하지 않는다.
+%  - "최초로 제안/연결/검증" 계열 표현 금지. "TCAD 결과 = 실측 결과"라고 쓰지 않는다.
+%  - ANN/MOBO(multi-objective BO)/NSGA-II를 실제 구현한 것처럼 쓰지 않는다.
+%    실제 구현은 GP(RBF kernel) + UCB 기반 single-objective Bayesian optimization뿐이다.
+
+Asymmetric dual-spacer trigate FinFET의 device-circuit codesign 및 variability 분석은 Pal \emph{et al.}\cite{Pal2015AsymmetricDualSpacer}에서 직접적으로 다뤄진 바 있으며, 본 프로젝트와 가장 밀접하게 겹치는 선행연구다. Dual-$k$/asymmetric spacer가 회로 성능(SRAM, inverter delay)과 연결됨은 \cite{Pal2013RobustSRAM,Pal2014SymmetricDualK,Pal2015Comparative,Pal2016Capacitive}에서도 보고되었다. Dual-$k$ spacer가 전계 분포와 parasitic capacitance에 미치는 물리적 영향은 \cite{Dutta2016ElectricField}, gate fringe field가 barrier lowering 및 성능 trade-off에 미치는 영향은 \cite{Sachid2008GFIBL}에서 다뤄졌다. Low-$k$/hybrid spacer를 이용한 parasitic capacitance 저감의 공정 사례는 \cite{Yamashita2015SiBCN,Gu2020HybridLowK}에 보고되어 있다. FinFET 구조 자체의 배경은 \cite{Hisamoto2000FinFET}을, DOE 방법론(LHS)의 근거는 \cite{McKay1979LHS}을 따른다.
+
+본 프로젝트는 위 선행연구들의 asymmetric/dual-$k$ spacer FinFET 및 device-circuit codesign 흐름을 바탕으로, SOI FinFET seed deck에서 drain-side low-$k$ composite spacer 설계공간을 정의하고, 제한된 TCAD 실행 예산 안에서 device screening, circuit-level FO4 DTCO Pareto, fabrication-aware grid snapping, robust validation workflow를 구축하는 데 기여의 초점을 둔다. 구조 자체의 신규성이나 방법론의 최초성을 주장하지 않는다.
+
+% ============================================================================
+\section{Device Structure and Methodology}
+\label{sec:device}
+
+\subsection{Baseline and Proposed Structure}
+
+\missing{Week1(baseline)/Week2(proposed) 완료 후 작성}
+
+Baseline 구조는 substrate/BOX/fin/gate/spacer/source/drain/contact으로 구성된 대칭 Si$_3$N$_4$ spacer SOI FinFET이다. Proposed 구조는 source-side에 짧은 Si$_3$N$_4$ spacer($L_{sp,S}$), drain-side에 SiO$_2$ low-$k$ 구간($W_{low\text{-}k}$)을 포함한 더 긴 composite spacer($L_{sp,D}$)를 갖는다. 좌표계는 $x$축을 source$\rightarrow$drain 방향으로 고정한다.
+
+% TODO: 구조 스키마틱 그림 삽입 (07_docs/device_structure_schematic.png는 개념 정리용, 제출용은 재작성)
+% \begin{figure}[t]
+%   \centering
+%   \includegraphics[width=\linewidth]{PATH_TO_FIGURE}
+%   \caption{Baseline (symmetric) vs. proposed (asymmetric low-k composite) spacer structure.}
+%   \label{fig:structure}
+% \end{figure}
+
+\subsection{Design Variables and Fixed Conditions}
+
+Table~\ref{tab:design-space}는 탐색 대상 설계 변수를, Table~\ref{tab:fixed}는 고정 조건을 정리한다. 값은 \texttt{project.yaml}과 일치해야 한다.
+
+\begin{table}[t]
+\centering
+\caption{Design space (see \texttt{project.yaml: design\_space})}
+\label{tab:design-space}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Variable & Range & Meaning \\
+\midrule
+$L_{sp,S}$ & 3.0--7.0~nm & Source-side spacer length \\
+$L_{sp,D}$ & 5.0--11.0~nm & Drain-side spacer total length \\
+$W_{low\text{-}k}$ & 0.0--4.0~nm & Drain-side inner low-$k$ width \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+\footnotesize Constraints: $L_{sp,D} \geq L_{sp,S}$, $W_{low\text{-}k} \leq L_{sp,D}$.
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Fixed device conditions (see \texttt{project.yaml: fixed}) -- values TBD from original example, Week1}
+\label{tab:fixed}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Parameter & Value \\
+\midrule
+Gate length & \missing{Week1} \\
+Fin height & \missing{Week1} \\
+Fin width & \missing{Week1} \\
+EOT & \missing{Week1} \\
+$V_{DD}$ & \missing{Week1} \\
+Temperature & 300~K \\
+Gate dielectric / metal & HfO$_2$ / TiN \\
+Baseline spacer / low-$k$ & Si$_3$N$_4$ / SiO$_2$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+TCAD 시뮬레이션은 Synopsys Sentaurus(SWB, sprocess/sdevice)로 수행한다.
+
+% ============================================================================
+\section{Fabrication-Aware Active DOE Algorithm}
+\label{sec:doe}
+
+본 프로젝트가 사용하는 TCAD-Aware Fabrication-Constrained Active DOE는 다음 순서로 진행된다 (\texttt{README.md} 알고리즘 흐름과 동일):
+
+\begin{enumerate}
+  \item Initial DOE 24개 생성 (LHS, seed 고정)
+  \item Baseline / center / feasible-corner anchor case 추가
+  \item TCAD 결과 수집 및 공통 CSV(\texttt{all\_results.csv}) 정리
+  \item Device-level screening으로 회로 검증 후보 축소 (maximize $I_{on}$; minimize $I_{off}$, DIBL, $C_{gd}$)
+  \item GP(RBF kernel) surrogate + UCB acquisition 기반 active DOE 후보 추천
+  \item 추천 후보 실행 후 예측값(predicted\_utility)과 실제 결과 비교 (surrogate calibration)
+  \item 후보를 fabrication-aware grid(0.5~nm)로 snapping
+  \item Grid-snapped 후보의 circuit-level FO4 검증
+  \item Circuit-level DTCO Pareto front 계산 (minimize FO4 delay, average power, energy per transition, EDP)
+  \item 최종 후보 주변 $\pm$0.3/$\pm$0.5~nm robust validation
+  \item Nominal optimum이 아니라 robust DTCO optimum 선정
+\end{enumerate}
+
+\emph{정확한 표현에 대한 주의:} 5--6단계는 여러 지표를 정규화 후 하나의 scalarized utility로 결합한 뒤, 이 utility에 대해 GP surrogate(RBF kernel, marginal likelihood 기준 length-scale grid search)를 학습하고 GP posterior mean/std로 UCB acquisition score를 계산하는 \textbf{single-objective Bayesian optimization}이다. 정식 multi-objective BO(MOBO)나 유전 알고리즘(NSGA-II), ANN 기반 최적화는 사용하지 않았다.
+
+% ============================================================================
+\section{Device-Level Results}
+\label{sec:device-results}
+
+\missing{Weekend1(baseline)/Weekend3(device screening, Pareto, surrogate calibration) 이후 작성 -- 현재 데이터 없음}
+
+\subsection{Baseline Verification}
+% Id-Vg/Id-Vd 수렴, NMOS/PMOS polarity, Ion/Ioff/Vth/SS/DIBL 표 + 그림
+
+\subsection{Baseline vs. Proposed Comparison}
+% Ion/Ioff/Vth/SS/DIBL/Cgd 비교표, electric field/current density contour
+
+\subsection{Device Screening Pareto}
+% Cgd vs Ion trade-off, 05_results/summary/device_screening_pareto.csv 기반
+
+\subsection{Surrogate Calibration (Predicted vs. Actual)}
+% 05_results/summary/predicted_vs_actual.csv: correlation, RMSE, 95% CI coverage
+
+% ============================================================================
+\section{Circuit-Level DTCO Results}
+\label{sec:circuit-results}
+
+\missing{Weekend4 이후 작성 -- 현재 데이터 없음}
+
+\subsection{Unit Inverter Sanity Check}
+% VTC, switching 정상 여부
+
+\subsection{FO4 Benchmark Results}
+% tpHL/tpLH, FO4 delay, output slew, average power, energy per transition, EDP 표 + waveform
+
+\subsection{Circuit-Level DTCO Pareto}
+% 05_results/summary/circuit_dtco_pareto.csv 기반 Pareto plot
+
+% ============================================================================
+\section{Robust Validation and Yield-like Analysis}
+\label{sec:robust}
+
+\missing{Weekend5 이후 작성 -- 현재 데이터 없음}
+
+\subsection{Local Refinement}
+% grid-snapped 후보 재검증
+
+\subsection{Robust Validation ($\pm$0.3/$\pm$0.5~nm)}
+% Ion retention, Cgd variation, EDP degradation, guardrail 통과 여부, robust_score
+
+\subsection{Yield-like Pass Rate}
+% 05_results/summary/yield_like.csv 기반 spec pass rate
+
+\subsection{Nominal Best vs. Robust DTCO Optimum}
+% 두 후보 비교, 최종 후보 선정 논리 (07_docs/report 자료의 input_output_analysis_interpretation.md 5.3절 참고)
+
+% ============================================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\missing{08-31 마감 직전, 전체 결과 확보 후 작성}
+
+한계로 명시할 항목 (초안 시 확인):
+\begin{itemize}
+  \item 초기 24개 DOE sample은 최종 통계적 증명이 아니라 탐색용 초기 sample이며, anchor case와 active DOE로 보강된다.
+  \item Active DOE는 여러 지표를 하나의 scalarized utility로 합친 single-objective Bayesian optimization이며, 정식 multi-objective BO는 아니다.
+  \item TCAD 결과는 실제 fabrication/실측 결과가 아니라 시뮬레이션 결과다.
+  \item 결과는 제한된 TCAD 실행 예산 안에서 얻어졌다.
+\end{itemize}
+
+% ============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+\missing{08-31 마감 직전 작성}
+
+% ============================================================================
+% \section*{Acknowledgment}
+% (필요 시)
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

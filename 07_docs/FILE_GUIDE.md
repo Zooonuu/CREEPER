@@ -1,3 +1,4 @@
+
 # FILE GUIDE
 
 이 문서는 `KUFET` 프로젝트에 존재하는 주요 파일과 폴더의 역할, 수정 시점, 생성 주체를 정리한다.
@@ -470,6 +471,9 @@ TCAD raw output의 로컬 보관 위치다.
 ### `06_submission/report/`
 
 보고서 파일을 둔다.
+
+- `report.tex`: 결과보고서 뼈대 (IEEEtran + kotex, XeLaTeX). Abstract/Introduction/Related Work/Device Structure/Active DOE Algorithm/Device Results/Circuit Results/Robust Validation/Discussion/Conclusion 구조이며, 데이터 의존 섹션은 실제 결과가 나오기 전까지 `\missing{...}` 표시로 비워둔다. 참고문헌은 `07_docs/references.bib`를 상대경로로 참조한다(중복 보관 안 함). 컴파일 방법은 파일 상단 주석 참고.
+- `input_output_analysis_interpretation.md`: 결과 해석 방법 정리 (기존 문서, report.tex 작성 시 5~7절 내용을 근거로 사용).
 
 ### `06_submission/poster/`
 
