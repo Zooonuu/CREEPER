@@ -308,9 +308,9 @@ python3 05_results/yield_like.py \
 
 ---
 
-## 작업 환경 분리
+## 작업 환경 분리 및 저장 방식
 
-이 프로젝트는 개인 노트북과 학교 TCAD PC를 Git 저장소로 동기화해서 진행한다.
+이 프로젝트는 개인 노트북과 학교 TCAD PC, 물리적으로 다른 두 컴퓨터를 Git 저장소로 동기화해서 진행한다. 학교 PC 화면에서만 만들어지는 결과(동작하는 deck 문법, 추출한 수치)는 Git으로 옮기지 않으면 PC가 초기화될 때 그대로 사라진다.
 
 ```text
 개인 노트북 / VS Code:
@@ -320,19 +320,41 @@ deck template 작성, Python 후처리 코드 작성, README/TODO 정리, 결과
 Sentaurus/Silvaco 실행, 원본 example 검증, TCAD raw output 생성
 ```
 
-기본 왕복 흐름:
+### 기본 왕복 흐름 (학교 PC에서 Git 원격 저장소 접근 가능한 경우)
+
+Week1 환경 확인 단계에서 학교 PC에서 `git clone`이 되는지 먼저 확인한다 (TODO.md Week1). 되는 경우 이 흐름을 기본으로 쓴다.
 
 ```text
-1. 노트북에서 deck/template/code 수정
-2. Git push
-3. 학교 PC에서 Git pull
-4. 학교 PC에서 TCAD 실행
-5. raw output은 학교 PC에 보존
-6. 요약 CSV, 핵심 figure, 필요한 log excerpt만 Git에 반영
-7. 노트북에서 Git pull 후 분석/문서화
+1. 노트북: deck template/Python 코드 수정 → git add/commit/push
+2. 학교 PC: git pull로 최신 template/코드 받기
+3. 학교 PC: SWB에서 실제 deck 작성 및 실행
+4. 학교 PC: deck이 한 번이라도 수렴/동작하면 그 즉시 실제 명령어 텍스트를
+   해당 .cmd.template 파일에 반영 → git add/commit/push
+   (세션 끝까지 기다리지 않는다 — 디버깅 결과가 가장 비싼 자산이다)
+5. 학교 PC: 추출한 수치 결과(Ion/Ioff/Cgd 등)를 all_results.csv에 직접
+   추가 → git add/commit/push
+6. 학교 PC: raw output(.tdr/.plt/.log 등)은 Git에 올리지 않고 로컬/USB에만 보관
+7. 노트북: git pull로 최신 deck/결과 받아서 분석/문서화 이어가기
 ```
 
-TCAD 대용량 파일인 `.tdr`, `.plt`, `.log`, `.msh`, `.str` 등은 Git에 올리지 않는다. 실패 case도 삭제하지 않되, 대용량 raw output은 학교 PC의 작업 디렉토리와 `05_results/raw/` 로컬 사본에 보관하고, Git에는 요약 결과만 남긴다.
+학교 PC에서 실행할 최소 명령어 예시:
+
+```bash
+git pull
+# ... SWB 작업 ...
+git add 01_baseline/process/baseline_sprocess.cmd.template \
+        05_results/summary/all_results.csv
+git commit -m "baseline sprocess deck 수렴 확인, Id-Vg 결과 반영"
+git push
+```
+
+### 인터넷이 막혀있는 경우 (fallback)
+
+학교 PC에서 push가 안 되면, 로컬 커밋을 `git bundle create backup.bundle main`으로 묶어 USB로 옮기고 노트북에서 `git pull backup.bundle main`으로 받는다. bundle도 안 되면 바뀐 `.cmd`/CSV 파일만 USB로 복사해와서 노트북에서 반영한다. 어느 방식이 되는지는 Week1에 확인한다.
+
+### Git에 올리지 않는 것
+
+TCAD 대용량 파일인 `.tdr`, `.plt`, `.log`, `.msh`, `.str` 등은 Git에 올리지 않는다. 실패 case도 삭제하지 않되, 대용량 raw output은 학교 PC의 작업 디렉토리와 `05_results/raw/` 로컬 사본에 보관하고, Git에는 요약 결과와 deck 텍스트만 남긴다.
 
 ---
 

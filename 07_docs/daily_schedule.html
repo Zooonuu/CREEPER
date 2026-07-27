@@ -19,13 +19,13 @@
   .subtitle { color: #555; font-size: 10.5pt; margin: 0 0 6mm 0; }
   .cover { margin-bottom: 6mm; }
   .cover .meta { font-size: 9.5pt; color: #666; }
-  table.calendar { width: 100%; border-collapse: collapse; margin: 4mm 0 6mm 0; font-size: 9.3pt; }
-  table.calendar th, table.calendar td { border: 1px solid #ccc; padding: 2mm 2.5mm; text-align: left; vertical-align: top; }
+  table.calendar { width: 100%; border-collapse: collapse; margin: 3mm 0 4mm 0; font-size: 8.8pt; page-break-inside: avoid; }
+  table.calendar th, table.calendar td { border: 1px solid #ccc; padding: 1.4mm 2.2mm; text-align: left; vertical-align: top; }
   table.calendar th { background: #1f4e8c; color: white; }
   table.calendar tr.buffer td { background: #fff3cd; font-weight: 600; }
   table.calendar tr.weekend td { background: #f3f3f3; color: #555; }
   .note-box {
-    background: #eef4fc; border-left: 4px solid #1f4e8c; padding: 3mm 4mm; margin: 0 0 6mm 0; font-size: 9.6pt;
+    background: #eef4fc; border-left: 4px solid #1f4e8c; padding: 2.2mm 3.5mm; margin: 0 0 3.5mm 0; font-size: 9pt;
   }
   .note-box b { color: #1f4e8c; }
   .week-section { page-break-before: always; padding-top: 2mm; }
@@ -65,6 +65,10 @@
 
 <div class="note-box">
   <b>일정 조정 요약</b> — 회로 DTCO(Week4)와 robust validation(Week5)이 가장 시간이 오래 걸리는 구간이라, 원래 5일이던 Week3을 3일(08-10~08-12)로 압축하고 08-13~08-14를 명시적 버퍼 2일로 확보했다. 압축분은 원래 Weekend2에 있던 "회로 조건 사전 확정" 작업(04_circuit template 검토, VDD/temperature/pulse 조건, 측정 기준, 결과 CSV 템플릿)을 Week2의 TCAD 대기 시간(DOE case가 실행되는 동안)으로 당겨서 처리하는 방식으로 확보한다. 버퍼 2일은 Week1~3이 밀리면 흡수 용도로, 정상 진행이면 Week4 baseline 회로 sanity check 조기 착수 용도로 쓴다. 이 일정은 계획이며, Week1~2 실제 진행 속도를 보고 Week3 이후 구간은 다시 보정할 수 있다.
+</div>
+
+<div class="note-box">
+  <b>저장 방식(Git 동기화) — 매일 지킬 규칙</b> — 학교 TCAD PC는 세션 종료/재부팅 시 초기화될 수 있다고 가정한다. deck 코드(.cmd)와 추출한 수치(CSV)는 전부 텍스트라 Git으로 안전하게 옮길 수 있지만, 그림/스크린샷과 raw output(.tdr/.plt/.log 등)은 Git에 올리지 않으므로 반드시 직접 export해서 챙겨야 한다. 7/28에 학교 PC에서 <code>git clone</code>뿐 아니라 <code>git push</code>까지 왕복되는지 먼저 확인한다 (README "작업 환경 분리 및 저장 방식" 참고). <b>핵심 습관: deck이 한 번이라도 수렴/동작하면 세션이 끝날 때까지 기다리지 말고 그 즉시 해당 .cmd.template 파일에 반영해 <code>git commit</code>/<code>push</code> — 디버깅 결과가 가장 비싼 자산이다.</b> push가 막혀있으면 <code>git bundle</code> 또는 USB로 파일만 복사하는 fallback으로 전환한다 (README 참고).
 </div>
 
 <h2>전체 캘린더 (조정판)</h2>
@@ -108,6 +112,7 @@
     <li>structure/mesh/Id-Vg 결과가 뭐라도 나오는지 확인</li>
     <li>결과 파일을 USB/외장 SSD로 복사해보기 (반출 절차 테스트)</li>
     <li>우리 repo를 이 PC로 git clone 되는지 확인</li>
+    <li>clone이 되면, 사소한 변경(빈 줄 하나 등)으로 git push까지 실제로 왕복되는지 테스트 — 여기서 오늘 이후 매일 쓸 저장 방식(위 note-box)이 확정됨. 안 되면 git bundle/USB fallback으로 전환</li>
   </ul>
   <div class="extra-label">2. 시간이 남으면</div>
   <ul class="check">
@@ -146,6 +151,7 @@
     <li>NMOS Id-Vg 실행 → 수렴 확인</li>
     <li>NMOS Id-Vd 실행 → 수렴 확인</li>
     <li>Id-Vg/Id-Vd 결과 화면/plot 저장</li>
+    <li>수렴 확인되는 즉시 baseline_sprocess/sdevice 명령어를 .cmd.template에 반영하고 git commit/push (끝날 때까지 기다리지 않기)</li>
   </ul>
   <div class="extra-label">2. 시간이 남으면</div>
   <ul class="check">
@@ -161,7 +167,7 @@
     <li>PMOS Id-Vg 실행 → 수렴 확인</li>
     <li>PMOS Id-Vd 실행 → 수렴 확인</li>
     <li>Ion, Ioff, Vth, SS, DIBL, Cgd 추출</li>
-    <li>추출값을 CSV로 정리 (all_results.csv에 baseline row로 반영 시작 — TODO.md §2 스키마)</li>
+    <li>추출값을 CSV로 정리 (all_results.csv에 baseline row로 반영 시작 — TODO.md §2 스키마) 후 git commit/push</li>
     <li>baseline 구조/지표 동결 표시</li>
     <li>Week1 산출물 목록과 대조 확인 (example 경로, tool/version, 실행 스크린샷, 구조 그림, Id-Vg/Id-Vd 그래프)</li>
   </ul>
@@ -196,6 +202,7 @@
     <li>drain-side spacer 내부에 SiO2 low-k 구간 구현</li>
     <li>실제 생성된 L_sp_S/L_sp_D/W_low_k 값이 의도한 값과 맞는지 구조 파일에서 직접 확인</li>
     <li>x축(Source→Drain) 방향이 맞게 고정됐는지 확인 — 나중에 회로 연결 방향과 직결</li>
+    <li>구조가 의도대로 나오면 즉시 proposed_sprocess.cmd.template에 반영하고 git commit/push</li>
   </ul>
   <div class="extra-label">2. 시간이 남으면</div>
   <ul class="check"><li>proposed 3D mesh 생성 시도</li></ul>
@@ -209,6 +216,7 @@
     <li>baseline과 동일한 bias/mesh/physics 조건인지 재대조 (달라지면 비교 자체가 무의미 — 오늘 제일 중요)</li>
     <li>proposed NMOS Id-Vg 실행 → 수렴 확인</li>
     <li>proposed NMOS Id-Vd 실행 → 수렴 확인</li>
+    <li>수렴 확인되는 즉시 proposed_nmos_sdevice.cmd.template에 반영하고 git commit/push</li>
   </ul>
   <div class="extra-label">2. 시간이 남으면</div>
   <ul class="check">
@@ -227,6 +235,7 @@
     <li>baseline vs proposed 비교표 작성</li>
     <li>electric field/current density contour에서 drain 쪽 전계 완화 여부 확인</li>
     <li>Cgd 변화율(%) 계산</li>
+    <li>수렴 확인되는 즉시 proposed_pmos_sdevice.cmd.template에 반영하고 all_results.csv 업데이트 → git commit/push</li>
   </ul>
   <div class="extra-label">2. 시간이 남으면</div>
   <ul class="check">

@@ -69,6 +69,7 @@ SOI FinFET에서 drain-side low-k composite spacer 구조를 설계하고,
 - [ ] structure/mesh/Id-Vg 결과 확인
 - [ ] 결과 파일 USB/외장 SSD로 복사 테스트
 - [ ] 우리 repo를 TCAD PC로 복사 또는 `git clone` 가능 여부 확인
+- [ ] `git clone`이 되면, 사소한 변경(예: 빈 줄 하나)으로 `git push`까지 실제로 되는지 왕복 테스트 (clone만 되고 push가 막혀있으면 README "인터넷이 막혀있는 경우" fallback으로 전환)
 - [ ] 원본 example의 gate_length, fin_height, fin_width, EOT, VDD 실제 값 확인 → `project.yaml`의 `fixed`에 기록
 - [ ] 원본 example의 spacer 공정 step(치수 단위)을 참고해 `fabrication_grid.step_nm`(현재 0.5nm 가안) 현실성 점검
 
