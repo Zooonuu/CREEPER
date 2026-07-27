@@ -390,6 +390,30 @@ Robust variation 결과에서 yield-like spec pass rate를 계산한다.
 - Ion retention, Cgd variation, EDP/FO4 delay/power/energy degradation별 pass rate
 - 실패한 variation label
 
+### `05_results/predicted_vs_actual.py`
+
+GP-UCB active DOE의 예측값(`predicted_utility`)이 실제 TCAD 결과와 얼마나 맞는지 확인하는 surrogate calibration 스크립트다.
+
+입력:
+
+- `03_doe/cases/active_suggested_cases.csv` (predicted_utility, surrogate_uncertainty 포함)
+- `05_results/summary/all_results.csv` (추천된 case_id가 실제로 실행된 뒤의 결과)
+
+출력:
+
+- `05_results/summary/predicted_vs_actual.csv`
+
+계산 항목:
+
+- `suggest_active_cases.py`와 동일한 scalarized utility 공식으로 실제 결과의 actual_utility 계산
+- Pearson correlation, Spearman rank correlation, RMSE, MAE
+- 실제값이 GP 예측 95% 신뢰구간(`predicted_utility ± 1.96*surrogate_uncertainty`) 안에 들어오는 비율 (CI coverage)
+
+역할:
+
+- "GP-UCB를 썼다"는 주장에서 그치지 않고, 예측이 실제로 유효했는지(맞았는지) 정량적으로 보여주는 근거 자료
+- 최소 `min_matched_cases`(기본 3)개 이상 case_id가 실제로 실행되어 `all_results.csv`에 들어와야 실행 가능
+
 ### `05_results/plot_figures.py`
 
 최종 figure 생성을 담당한다.
@@ -401,6 +425,7 @@ Robust variation 결과에서 yield-like spec pass rate를 계산한다.
 - Device screening Pareto front
 - Circuit-level DTCO Pareto front
 - Active DOE 전후 비교
+- GP-UCB 예측값 vs 실제 TCAD값 비교 (surrogate calibration)
 - Robust optimum summary
 
 ### `05_results/raw/`
@@ -423,6 +448,7 @@ TCAD raw output의 로컬 보관 위치다.
 - `circuit_dtco_pareto.csv`
 - `robust_results.csv`
 - `robust_optimum.csv`
+- `predicted_vs_actual.csv`
 
 주의:
 

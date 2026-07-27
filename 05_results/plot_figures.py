@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import argparse
 import os
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 
@@ -53,6 +53,9 @@ LABELS = {
     "compensation_min_pct": "Worst compensation (%)",
     "edp_degradation_max_pct": "Worst EDP degradation (%)",
     "robust_score": "Robust score",
+    "predicted_utility": "Predicted utility (GP-UCB mean)",
+    "actual_utility": "Actual utility (TCAD)",
+    "surrogate_uncertainty": "GP predicted std",
 }
 
 DEFAULT_HEATMAP_METRICS = (
@@ -375,6 +378,66 @@ def plot_robust_summary(
     return paths
 
 
+def plot_predicted_vs_actual(
+    df: pd.DataFrame,
+    output_dir: Path,
+    file_format: str,
+    dpi: int,
+) -> Path | None:
+    if "predicted_utility" not in df.columns or "actual_utility" not in df.columns:
+        return None
+    has_uncertainty = "surrogate_uncertainty" in df.columns
+    columns = ["predicted_utility", "actual_utility"] + (["surrogate_uncertainty"] if has_uncertainty else [])
+    data = numeric_frame(df, columns)
+    if data.empty:
+        return None
+
+    fig, ax = plt.subplots(figsize=(5.6, 5.6), constrained_layout=True)
+    if has_uncertainty:
+        ax.errorbar(
+            data["predicted_utility"],
+            data["actual_utility"],
+            xerr=1.96 * data["surrogate_uncertainty"],
+            fmt="o",
+            color="#2f80ed",
+            ecolor="#9fc1f5",
+            elinewidth=1.2,
+            capsize=3,
+            markersize=6,
+            markeredgecolor="white",
+            label="Active DOE case (95% CI)",
+        )
+    else:
+        ax.scatter(
+            data["predicted_utility"],
+            data["actual_utility"],
+            s=58,
+            color="#2f80ed",
+            edgecolor="white",
+            linewidth=0.7,
+            label="Active DOE case",
+        )
+
+    lo = float(min(data["predicted_utility"].min(), data["actual_utility"].min()))
+    hi = float(max(data["predicted_utility"].max(), data["actual_utility"].max()))
+    pad = (hi - lo) * 0.08 if hi > lo else 0.05
+    ax.plot(
+        [lo - pad, hi + pad],
+        [lo - pad, hi + pad],
+        color="#d94f45",
+        linestyle="--",
+        linewidth=1.2,
+        label="Predicted = Actual",
+    )
+    ax.set_xlim(lo - pad, hi + pad)
+    ax.set_ylim(lo - pad, hi + pad)
+    ax.set_title("GP-UCB surrogate: predicted vs actual TCAD utility")
+    ax.set_xlabel(label_for("predicted_utility"))
+    ax.set_ylabel(label_for("actual_utility"))
+    ax.legend()
+    return save(fig, output_dir, "predicted_vs_actual_utility", file_format, dpi)
+
+
 def read_optional_csv(path: Path) -> pd.DataFrame | None:
     if not path.exists():
         return None
@@ -388,6 +451,9 @@ def main() -> None:
     parser.add_argument("--all-metrics", type=Path, default=ROOT / "05_results/summary/all_metrics.csv")
     parser.add_argument("--pareto", type=Path, default=ROOT / "05_results/summary/pareto.csv")
     parser.add_argument("--robust-optimum", type=Path, default=ROOT / "05_results/summary/robust_optimum.csv")
+    parser.add_argument(
+        "--predicted-vs-actual", type=Path, default=ROOT / "05_results/summary/predicted_vs_actual.csv"
+    )
     parser.add_argument("--output-dir", type=Path, default=ROOT / "05_results/figures")
     parser.add_argument("--heatmap-metrics", nargs="*", help="Metric columns to draw as response maps.")
     parser.add_argument("--pareto-objectives", nargs=2, help="Two objective columns to use for the Pareto plot.")
@@ -404,6 +470,7 @@ def main() -> None:
     all_df = read_optional_csv(args.all_metrics)
     pareto_df = read_optional_csv(args.pareto)
     robust_df = read_optional_csv(args.robust_optimum)
+    pva_df = read_optional_csv(args.predicted_vs_actual)
 
     if all_df is not None:
         requested_metrics = args.heatmap_metrics or auto_heatmap_metrics(all_df)
@@ -432,8 +499,16 @@ def main() -> None:
     if robust_df is not None:
         written.extend(plot_robust_summary(robust_df, args.output_dir, args.format, args.dpi, guardrails))
 
+    if pva_df is not None:
+        path = plot_predicted_vs_actual(pva_df, args.output_dir, args.format, args.dpi)
+        if path is not None:
+            written.append(path)
+
     if not written:
-        print("no figures generated; provide all_metrics.csv, pareto.csv, or robust_optimum.csv")
+        print(
+            "no figures generated; provide all_metrics.csv, pareto.csv, robust_optimum.csv, "
+            "or predicted_vs_actual.csv"
+        )
         return
 
     print("generated figures:")

@@ -136,10 +136,12 @@ DOE 착수:
 - [ ] `python3 05_results/pareto.py`로 device Pareto 계산
 - [ ] Cgd-Ion trade-off 확인
 - [ ] `python3 03_doe/suggest_active_cases.py --mode device_screening`으로 active DOE 후보 추천
+- [ ] 추천된 active DOE 후보 실행 → 결과를 `all_results.csv`에 병합
+- [ ] `python3 05_results/predicted_vs_actual.py --mode device_screening`으로 GP-UCB 예측값(predicted_utility) vs 실제 TCAD 결과 비교 (calibration 확인: correlation, RMSE, 95% CI coverage)
 - [ ] 회로 검증 후보 3~5개 선정
 - [ ] MixedMode 또는 회로 시뮬레이션 사용 가능 여부 확인 (TCAD PC에서)
 
-산출물: `05_results/summary/all_results.csv`, 실패 case 목록, device Pareto plot, Cgd vs Ion trade-off 그래프, 회로 검증 후보 3~5개 목록
+산출물: `05_results/summary/all_results.csv`, 실패 case 목록, device Pareto plot, Cgd vs Ion trade-off 그래프, `05_results/summary/predicted_vs_actual.csv` 및 예측 vs 실측 그래프, 회로 검증 후보 3~5개 목록
 
 ### Weekend3 (08-15~08-16): 정리
 
@@ -163,8 +165,9 @@ Proposed 후보 회로 검증 (drain-side composite spacer는 반드시 switchin
 - [ ] FO4 transient 실행 → tpHL/tpLH, FO4 delay, output slew, average power, energy per transition, EDP 추출
 - [ ] `python3 05_results/pareto.py`(circuit_dtco)로 circuit Pareto 계산
 - [ ] 필요시 `python3 03_doe/suggest_active_cases.py --mode circuit_dtco`로 추가 후보 추천
+- [ ] circuit_dtco active DOE 후보를 실행했다면 `python3 05_results/predicted_vs_actual.py --mode circuit_dtco`로 예측 vs 실측 재확인
 
-산출물: baseline/후보별 inverter VTC, FO4 waveform, delay/power/energy/EDP 표, circuit Pareto plot
+산출물: baseline/후보별 inverter VTC, FO4 waveform, delay/power/energy/EDP 표, circuit Pareto plot, (해당 시) circuit_dtco 모드 예측 vs 실측 비교 결과
 
 ### Weekend4 (08-22~08-23): 정리
 
@@ -226,6 +229,7 @@ case_id,unit_inverter_ok,tpHL_s,tpLH_s,fo4_delay_s,output_slew_s,average_power_W
 - [ ] DOE response map
 - [ ] device Pareto plot
 - [ ] Cgd-Ion trade-off 그래프
+- [ ] GP-UCB 예측값 vs 실제 TCAD값 비교 그래프 (surrogate calibration)
 
 회로 중심 그림/표:
 

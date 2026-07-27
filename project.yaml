@@ -103,6 +103,14 @@ active_doe:
         require_fo4_transient: true
   output: 03_doe/cases/active_suggested_cases.csv
 
+surrogate_validation:
+  enabled: true
+  purpose: check whether GP-UCB predicted_utility (and its uncertainty) matches the actual TCAD result once a suggested active DOE case is run, not just used as a black-box acquisition function
+  compare_basis: active_doe
+  min_matched_cases: 3
+  ci_z_score: 1.96
+  output: 05_results/summary/predicted_vs_actual.csv
+
 local_refinement:
   enabled: true
   selection_basis: circuit_dtco

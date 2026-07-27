@@ -1,12 +1,13 @@
-from pathlib import Path
 import sys
+from pathlib import Path
+
 import yaml
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 required = [
     "README.md",
     "TODO.md",
-    "FILE_GUIDE.md",
+    "07_docs/FILE_GUIDE.md",
     "project.yaml",
     "00_original_example",
     "01_baseline/process",
@@ -25,6 +26,7 @@ required = [
     "05_results/pareto.py",
     "05_results/robust_optimum.py",
     "05_results/yield_like.py",
+    "05_results/predicted_vs_actual.py",
     "06_submission",
 ]
 
@@ -33,7 +35,7 @@ missing = [item for item in required if not (ROOT / item).exists()]
 try:
     with (ROOT / "project.yaml").open(encoding="utf-8") as f:
         yaml.safe_load(f)
-except Exception as exc:
+except (OSError, yaml.YAMLError) as exc:
     missing.append(f"project.yaml error: {exc}")
 
 if missing:

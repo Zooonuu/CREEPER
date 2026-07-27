@@ -95,6 +95,10 @@ SOI FinFET의 drain 쪽 spacer 구조를 바꿔서, 소자 지표가 아니라
 - generate_robust_cases.py       : ±0.3/±0.5nm 공정 편차 case 생성
 - pareto.py                      : Pareto front 계산 (소자용/회로용)
 - robust_optimum.py, yield_like.py : robust 결과 요약, spec 통과율 계산
+- predicted_vs_actual.py         : active DOE로 추천된 case를 실제 TCAD로 돌린 뒤,
+                                    GP-UCB가 예측한 predicted_utility와 실측값을 비교
+                                    (correlation/RMSE/95% CI coverage). "GP-UCB를 썼다"에서
+                                    그치지 않고 예측이 실제로 맞았는지 보여주는 근거
 
 지금까지 실제로 실행된 것: 없음. 전부 스크립트/template만 준비된
 상태이고, 실제 TCAD 결과(all_results.csv 등)는 아직 없음.
@@ -321,3 +325,11 @@ A. 원본 example의 실제 값이 아니라, "이 정도 해상도면 현실적
 Q. Yield가 몇 %인가요?
 A. 실제 fab yield가 아니라, robust validation에서 만든 공정 편차
    샘플 중 정해진 spec을 통과하는 비율(yield-like pass rate)입니다.
+
+Q. GP surrogate 예측이 실제로 맞았는지 어떻게 확인했나요?
+A. active DOE로 추천된 case를 실제 TCAD로 실행한 뒤,
+   predicted_vs_actual.py로 GP가 예측한 값(predicted_utility)과 실측값을
+   비교했습니다. 상관계수(Pearson/Spearman), RMSE, 그리고 GP가 예측한
+   95% 신뢰구간 안에 실측값이 들어오는 비율(CI coverage)을 계산해서
+   surrogate가 단순히 "썼다"가 아니라 실제로 유효했는지 정량적으로
+   보여줍니다.

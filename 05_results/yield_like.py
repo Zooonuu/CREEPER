@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
 import pandas as pd
@@ -108,7 +108,6 @@ def main() -> None:
 
     df = pd.read_csv(args.input)
     required = [args.base_col, args.variation_col, args.ion_col, args.cgd_col, args.edp_col]
-    optional = [args.delay_col, args.average_power_col, args.energy_col]
     require_columns(df, required, "yield-like input")
 
     df = df.rename(columns={args.base_col: "base_case_id", args.variation_col: "variation_kind"})
