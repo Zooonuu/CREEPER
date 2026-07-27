@@ -48,11 +48,12 @@
 3. TCAD 결과 수집 및 공통 CSV 정리
 4. Device-level screening으로 회로 검증 후보 축소
 5. Surrogate model(Gaussian Process, GP-UCB acquisition) 기반 active DOE 후보 추천
-6. 후보를 fabrication-aware grid로 snapping
-7. Grid-snapped 후보의 circuit-level FO4 검증
-8. Circuit-level DTCO Pareto front 계산
-9. 최종 후보 주변 ±0.3/±0.5 nm robust validation
-10. nominal optimum이 아니라 robust DTCO optimum 선정
+6. 추천된 active DOE 후보를 실행하고, GP-UCB 예측값(predicted_utility)과 실제 TCAD/회로 결과를 비교해 surrogate calibration 확인
+7. 후보를 fabrication-aware grid로 snapping
+8. Grid-snapped 후보의 circuit-level FO4 검증
+9. Circuit-level DTCO Pareto front 계산
+10. 최종 후보 주변 ±0.3/±0.5 nm robust validation
+11. nominal optimum이 아니라 robust DTCO optimum 선정
 ```
 
 핵심 주장은 다음과 같다.
@@ -171,6 +172,7 @@ W_low_k: 0.0 ~ 4.0 nm
 - Baseline, center, feasible corner anchor case
 - Device-level screening 후보
 - Surrogate-assisted active DOE 추천 후보
+- GP-UCB 예측값(predicted_utility) vs 실제 TCAD/회로 결과 calibration (correlation, RMSE, 95% CI coverage)
 - Fabrication-aware grid-snapped 후보
 - 후보 주변 local refinement
 - Circuit-level DTCO Pareto front
@@ -190,13 +192,16 @@ Hold-out 검증은 현재 프로젝트 범위에서 제외한다.
 02_proposed/           비대칭 composite spacer SOI FinFET
 03_doe/                DOE, anchor case, active DOE, local refinement, robust case 생성
 04_circuit/            unit inverter와 FO4 inverter benchmark
-05_results/            원본 결과, 요약 CSV, Pareto/robust 분석, 최종 그림
+05_results/            원본 결과, 요약 CSV, Pareto/robust/calibration 분석, 최종 그림
 06_submission/         보고서, 포스터, 발표자료
+07_docs/                FILE_GUIDE.md, PROMPT.txt, 일별 실행 스케줄, requirements.txt,
+                        check_project.py, 참고문헌(REFERENCE_LINKS_SUMMARY.md/references.bib) 등 부속 문서/도구
 README.md              연구 전체 설명
 TODO.md                실제 진행 순서
-FILE_GUIDE.md          모든 파일의 역할
-project.yaml           공통 파라미터 및 알고리즘 설정
+project.yaml            공통 파라미터 및 알고리즘 설정
 ```
+
+모든 파일의 세부 역할은 `07_docs/FILE_GUIDE.md`를 참고한다.
 
 불필요한 계획 문서는 추가하지 않는다. 새로운 결정과 현재 진행상황은 `TODO.md`에만 갱신한다.
 
@@ -228,8 +233,8 @@ Python 환경:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-python3 check_project.py
+pip install -r 07_docs/requirements.txt
+python3 07_docs/check_project.py
 ```
 
 Initial DOE 24개 생성:
@@ -278,6 +283,17 @@ python3 03_doe/suggest_active_cases.py \
   --input 05_results/summary/all_results.csv \
   --mode circuit_dtco
 ```
+
+추천된 active DOE 후보를 TCAD로 실행해 `all_results.csv`에 병합한 뒤, GP-UCB 예측값(predicted_utility)과 실제 결과를 비교하는 surrogate calibration 예시:
+
+```bash
+python3 05_results/predicted_vs_actual.py \
+  --suggested 03_doe/cases/active_suggested_cases.csv \
+  --actual 05_results/summary/all_results.csv \
+  --mode device_screening
+```
+
+`--mode`는 생략하면 `active_suggested_cases.csv`의 `active_doe_mode` 컬럼에서 자동으로 추론한다. 최소 `min_matched_cases`(기본 3)개 이상의 추천 case_id가 `all_results.csv`에 실제 결과로 들어와 있어야 실행된다.
 
 Circuit-level Pareto 후보 주변 grid-snapped local refinement 생성:
 

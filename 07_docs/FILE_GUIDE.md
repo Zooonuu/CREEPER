@@ -8,6 +8,8 @@
 
 ## 1. 최상위 파일
 
+`README.md`, `TODO.md`, `project.yaml`, `.gitignore`는 리포 루트에 있다. `requirements.txt`, `check_project.py`, 참고문헌 파일 등 나머지 부속 문서/도구는 `07_docs/`에 있다 (아래 각 항목에 실제 경로 표기).
+
 ### `README.md`
 
 프로젝트의 대표 설명 문서다.
@@ -78,7 +80,7 @@
 - 범위 변경 시 commit과 이유를 남긴다.
 - `active_doe`에 실제 구현하지 않은 ANN, MOBO(multi-objective BO), NSGA-II 같은 알고리즘명을 넣지 않는다. GP 기반 single-objective Bayesian optimization(현재 구현)은 정확한 표현이므로 그대로 사용 가능.
 
-### `requirements.txt`
+### `07_docs/requirements.txt`
 
 Python 분석 환경에서 필요한 패키지 목록이다.
 
@@ -90,14 +92,14 @@ Python 분석 환경에서 필요한 패키지 목록이다.
 - `matplotlib`
 - `PyYAML`
 
-### `check_project.py`
+### `07_docs/check_project.py`
 
 필수 파일과 폴더가 존재하는지 검사한다.
 
 실행:
 
 ```bash
-python3 check_project.py
+python3 07_docs/check_project.py
 ```
 
 정상 출력:
@@ -522,7 +524,7 @@ status, note
 
 ## 9. 연구윤리 및 참고문헌 사용 원칙
 
-직접 중복 선행연구는 `references/REFERENCE_LINKS_SUMMARY.md`의 R01-R07을 우선 확인한다. 특히 R01은 asymmetric dual-spacer FinFET, device-circuit codesign, variability, inverter 평가가 본 프로젝트와 직접 겹치므로 반드시 인용한다.
+직접 중복 선행연구는 `07_docs/REFERENCE_LINKS_SUMMARY.md`의 R01-R07을 우선 확인한다. 특히 R01은 asymmetric dual-spacer FinFET, device-circuit codesign, variability, inverter 평가가 본 프로젝트와 직접 겹치므로 반드시 인용한다.
 
 안전한 기여 표현:
 
