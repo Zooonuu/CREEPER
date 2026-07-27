@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>KUFET 프로젝트 일별 실행 스케줄</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    color: #1a1a1a;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    margin: 0;
+  }
+  h1 { font-size: 19pt; margin: 0 0 2mm 0; }
+  h2 { font-size: 13.5pt; margin: 0 0 3mm 0; color: #1f4e8c; border-bottom: 2px solid #1f4e8c; padding-bottom: 1.5mm; }
+  h3 { font-size: 11.5pt; margin: 0 0 1.5mm 0; color: #1f4e8c; }
+  .subtitle { color: #555; font-size: 10.5pt; margin: 0 0 6mm 0; }
+  .cover { margin-bottom: 6mm; }
+  .cover .meta { font-size: 9.5pt; color: #666; }
+  table.calendar { width: 100%; border-collapse: collapse; margin: 4mm 0 6mm 0; font-size: 9.3pt; }
+  table.calendar th, table.calendar td { border: 1px solid #ccc; padding: 2mm 2.5mm; text-align: left; vertical-align: top; }
+  table.calendar th { background: #1f4e8c; color: white; }
+  table.calendar tr.buffer td { background: #fff3cd; font-weight: 600; }
+  table.calendar tr.weekend td { background: #f3f3f3; color: #555; }
+  .note-box {
+    background: #eef4fc; border-left: 4px solid #1f4e8c; padding: 3mm 4mm; margin: 0 0 6mm 0; font-size: 9.6pt;
+  }
+  .note-box b { color: #1f4e8c; }
+  .week-section { page-break-before: always; padding-top: 2mm; }
+  .week-section:first-of-type { page-break-before: auto; }
+  .week-header { margin-bottom: 4mm; }
+  .week-header .range { color: #555; font-size: 10pt; font-weight: normal; }
+  .day-card {
+    border: 1px solid #d8d8d8; border-radius: 2mm; margin: 0 0 4mm 0; padding: 3mm 4mm; page-break-inside: avoid;
+  }
+  .day-card.buffer-card { border-color: #e0b400; background: #fffdf5; }
+  .day-title {
+    font-size: 11pt; font-weight: 700; margin: 0 0 2mm 0; display: flex; justify-content: space-between;
+  }
+  .day-title .time { font-weight: 400; color: #666; font-size: 9.3pt; }
+  .goal-label { font-size: 9.3pt; font-weight: 700; color: #1f4e8c; margin: 2mm 0 1mm 0; }
+  .extra-label { font-size: 9.3pt; font-weight: 700; color: #7a6a00; margin: 2mm 0 1mm 0; }
+  ul.check { list-style: none; margin: 0; padding: 0; }
+  ul.check li { margin: 0.8mm 0; padding-left: 4.5mm; text-indent: -4.5mm; }
+  ul.check li::before { content: "\2610  "; }
+  .weekend-block {
+    border: 1px dashed #b8b8b8; border-radius: 2mm; margin: 0 0 4mm 0; padding: 2.5mm 4mm; background: #fafafa;
+  }
+  .weekend-block .day-title { font-size: 10pt; color: #555; }
+  .deliverable {
+    font-size: 9pt; color: #555; margin-top: 2mm; padding-top: 1.5mm; border-top: 1px dotted #ccc;
+  }
+  .footer-note { font-size: 8.5pt; color: #888; margin-top: 8mm; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>KUFET 프로젝트 일별 실행 스케줄</h1>
+  <p class="subtitle">Surrogate-Assisted TCAD DTCO of a Fabrication-Aware Asymmetric Low-k Composite Spacer in SOI FinFETs</p>
+  <p class="meta">작성일: 2026-07-27 · 대상 기간: 2026-07-28(화) ~ 2026-08-31(월) · 원본 마스터 체크리스트: TODO.md (본 문서는 TODO.md 기준 일정을 하루 단위로 펼친 실행용 스케줄이며, 진행 상황 체크는 TODO.md에서 한다)</p>
+</div>
+
+<div class="note-box">
+  <b>일정 조정 요약</b> — 회로 DTCO(Week4)와 robust validation(Week5)이 가장 시간이 오래 걸리는 구간이라, 원래 5일이던 Week3을 3일(08-10~08-12)로 압축하고 08-13~08-14를 명시적 버퍼 2일로 확보했다. 압축분은 원래 Weekend2에 있던 "회로 조건 사전 확정" 작업(04_circuit template 검토, VDD/temperature/pulse 조건, 측정 기준, 결과 CSV 템플릿)을 Week2의 TCAD 대기 시간(DOE case가 실행되는 동안)으로 당겨서 처리하는 방식으로 확보한다. 버퍼 2일은 Week1~3이 밀리면 흡수 용도로, 정상 진행이면 Week4 baseline 회로 sanity check 조기 착수 용도로 쓴다. 이 일정은 계획이며, Week1~2 실제 진행 속도를 보고 Week3 이후 구간은 다시 보정할 수 있다.
+</div>
+
+<h2>전체 캘린더 (조정판)</h2>
+<table class="calendar">
+  <tr><th>구간</th><th>날짜</th><th>내용</th></tr>
+  <tr><td>Week1</td><td>07-27(월)~07-31(금)</td><td>환경 확인 + Baseline 소자 확보</td></tr>
+  <tr class="weekend"><td>Weekend1</td><td>08-01~08-02</td><td>baseline 결과 정리, 선행연구 초안</td></tr>
+  <tr><td>Week2</td><td>08-03(월)~08-07(금)</td><td>Proposed 구현 + initial DOE/anchor 생성 및 실행 착수 (회로 조건 사전 확정 병행)</td></tr>
+  <tr class="weekend"><td>Weekend2</td><td>08-08~08-09</td><td>결과 누적 정리, baseline vs proposed 비교 (경량화)</td></tr>
+  <tr><td>Week3 (압축)</td><td>08-10(월)~08-12(수)</td><td>DOE 마무리 + Device Screening + 회로 실행 환경 확인</td></tr>
+  <tr class="buffer"><td>버퍼</td><td>08-13(목)~08-14(금)</td><td>유동 버퍼 2일 — 지연 흡수 또는 Week4 조기 착수</td></tr>
+  <tr class="weekend"><td>Weekend3</td><td>08-15~08-16</td><td>device Pareto 정리, 회로 검증 후보 확정, 보고서 소자 섹션</td></tr>
+  <tr><td>Week4</td><td>08-17(월)~08-21(금)</td><td>회로 DTCO (unit inverter + FO4)</td></tr>
+  <tr class="weekend"><td>Weekend4</td><td>08-22~08-23</td><td>circuit Pareto 정리, 최종 후보 압축, 보고서 회로 섹션</td></tr>
+  <tr><td>Week5</td><td>08-24(월)~08-28(금)</td><td>Local Refinement + Robust Validation</td></tr>
+  <tr class="weekend"><td>Weekend5</td><td>08-29~08-30</td><td>robust summary 정리, 최종 스토리 정리</td></tr>
+  <tr><td>마감</td><td>08-31(월)</td><td>최종 그림/표/표현 검토, 제출물 마무리</td></tr>
+</table>
+
+<!-- ============ WEEK 1 REMAINDER ============ -->
+<div class="week-section">
+<div class="week-header"><h2>Week1 나머지 <span class="range">07-28(화) ~ 07-31(금) · 환경 확인 + Baseline</span></h2></div>
+
+<div class="day-card">
+  <div class="day-title">7/28(화) <span class="time">14:00–22:00</span></div>
+  <div class="goal-label">0. 접속</div>
+  <ul class="check">
+    <li>MobaXterm으로 서버 접속 (저장된 세션 있으면 더블클릭, 없으면 확인부터)</li>
+    <li><code>echo $DISPLAY</code>로 X11 살아있는지 확인</li>
+    <li><code>xclock</code>으로 GUI 뜨는지 테스트</li>
+    <li><code>lmutil lmstat -a</code>로 sprocess/sdevice seat 수 확인</li>
+  </ul>
+  <div class="goal-label">1. 오늘 목표: 환경 확인 (TODO.md Week1 본 목표)</div>
+  <ul class="check">
+    <li>Sentaurus 실행 환경 로드 방법 확인하고 정확히 기록 (module load / source 등 — 매번 필요하므로 메모 필수)</li>
+    <li>Sentaurus Process(sprocess) 실행 확인 (버전 출력 정도만 떠도 OK)</li>
+    <li>Sentaurus Device(sdevice) 실행 확인</li>
+    <li>Sentaurus Visual/Inspect 실행 확인</li>
+    <li>실행 가능한 3D FinFET example 파일 위치 확보</li>
+    <li>원본 example 수정하지 말고 1회 그대로 실행</li>
+    <li>structure/mesh/Id-Vg 결과가 뭐라도 나오는지 확인</li>
+    <li>결과 파일을 USB/외장 SSD로 복사해보기 (반출 절차 테스트)</li>
+    <li>우리 repo를 이 PC로 git clone 되는지 확인</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check">
+    <li>원본 example에서 gate_length_nm, fin_height_nm, fin_width_nm, eot_nm, vdd_V 실제 값 확인 → project.yaml의 fixed에 기록할 것</li>
+    <li>원본 example의 spacer 공정 step 치수 확인 (fabrication_grid.step_nm 0.5nm 현실성 점검용)</li>
+  </ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">7/29(수) <span class="time">14:00–22:00</span></div>
+  <div class="goal-label">0. 접속 &amp; 환경 재로드</div>
+  <ul class="check">
+    <li>어제 기록해둔 절차로 재접속, Sentaurus 환경 로드 명령어 그대로 재실행 (세션마다 필요한지도 확인)</li>
+  </ul>
+  <div class="goal-label">1. 오늘 목표: fixed 파라미터 확정 + baseline 구조 세팅</div>
+  <ul class="check">
+    <li>(어제 못했다면) gate_length_nm / fin_height_nm / fin_width_nm / eot_nm / vdd_V 실제 값 확인</li>
+    <li>확인한 값을 project.yaml의 fixed: 항목에 직접 기록 (null → 실제 숫자)</li>
+    <li>원본 example의 spacer 공정 step 치수 확인 → fabrication_grid.step_nm(현재 0.5nm 가정) 현실성 점검</li>
+    <li>원본 3D FinFET example 폴더를 그대로 복사해 01_baseline/ 작업 폴더로 이동 (원본 수정 금지)</li>
+    <li>복사한 구조에서 substrate/BOX/fin/gate/spacer/source/drain/contact 위치 확인</li>
+    <li>spacer가 source/drain 양쪽 동일한 Si3N4(대칭)인지 확인</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check">
+    <li>baseline 3D mesh 생성 시도 (수렴 안 돼도 오늘은 시도만)</li>
+    <li>오늘 진행 기록 (TODO.md §5 양식대로)</li>
+  </ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">7/30(목) <span class="time">14:00–22:00</span></div>
+  <div class="goal-label">1. 오늘 목표: baseline NMOS 확보</div>
+  <ul class="check">
+    <li>baseline 3D mesh 수렴 마무리</li>
+    <li>NMOS Id-Vg 실행 → 수렴 확인</li>
+    <li>NMOS Id-Vd 실행 → 수렴 확인</li>
+    <li>Id-Vg/Id-Vd 결과 화면/plot 저장</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check">
+    <li>baseline PMOS 구조만 미리 확인 (실행은 내일)</li>
+    <li>오늘 실행 기록 (case_id, deck, 결과, 에러메시지)</li>
+  </ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">7/31(금) — Week1 마감 <span class="time">14:00–22:00</span></div>
+  <div class="goal-label">1. 오늘 목표: PMOS 완료 + 지표 추출 + baseline 동결</div>
+  <ul class="check">
+    <li>PMOS Id-Vg 실행 → 수렴 확인</li>
+    <li>PMOS Id-Vd 실행 → 수렴 확인</li>
+    <li>Ion, Ioff, Vth, SS, DIBL, Cgd 추출</li>
+    <li>추출값을 CSV로 정리 (all_results.csv에 baseline row로 반영 시작 — TODO.md §2 스키마)</li>
+    <li>baseline 구조/지표 동결 표시</li>
+    <li>Week1 산출물 목록과 대조 확인 (example 경로, tool/version, 실행 스크린샷, 구조 그림, Id-Vg/Id-Vd 그래프)</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check">
+    <li>결과 파일 USB/SSD 백업 + repo 반영</li>
+    <li>02_proposed/process, 02_proposed/device template 미리 훑어보기</li>
+  </ul>
+  <div class="deliverable">산출물: 원본 example 경로/tool버전, 실행 스크린샷, baseline structure 그림, Id-Vg/Id-Vd 그래프, baseline metric CSV</div>
+</div>
+
+<div class="weekend-block">
+  <div class="day-title">Weekend1 · 08-01(토)~08-02(일)</div>
+  <ul class="check">
+    <li>baseline 결과 정리 (구조 그림, Id-Vg/Id-Vd 그래프, metric CSV)</li>
+    <li>보고서 배경/선행연구(R01 Pal et al. 등) 섹션 초안</li>
+  </ul>
+</div>
+</div>
+
+<!-- ============ WEEK 2 ============ -->
+<div class="week-section">
+<div class="week-header"><h2>Week2 <span class="range">08-03(월) ~ 08-07(금) · Proposed 구조 + DOE 착수</span></h2></div>
+
+<div class="day-card">
+  <div class="day-title">8/3(월)</div>
+  <div class="goal-label">1. 오늘 목표: proposed 구조 구현 시작</div>
+  <ul class="check">
+    <li>baseline deck 기준으로 02_proposed/ 작업 시작</li>
+    <li>source-side 짧은 Si3N4 spacer 구현</li>
+    <li>drain-side 긴 spacer 구현</li>
+    <li>drain-side spacer 내부에 SiO2 low-k 구간 구현</li>
+    <li>실제 생성된 L_sp_S/L_sp_D/W_low_k 값이 의도한 값과 맞는지 구조 파일에서 직접 확인</li>
+    <li>x축(Source→Drain) 방향이 맞게 고정됐는지 확인 — 나중에 회로 연결 방향과 직결</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>proposed 3D mesh 생성 시도</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/4(화)</div>
+  <div class="goal-label">1. 오늘 목표: proposed NMOS 확보</div>
+  <ul class="check">
+    <li>proposed 3D mesh 수렴 마무리</li>
+    <li>baseline과 동일한 bias/mesh/physics 조건인지 재대조 (달라지면 비교 자체가 무의미 — 오늘 제일 중요)</li>
+    <li>proposed NMOS Id-Vg 실행 → 수렴 확인</li>
+    <li>proposed NMOS Id-Vd 실행 → 수렴 확인</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check">
+    <li>proposed PMOS 구조만 미리 확인</li>
+    <li><b>[일정 조정]</b> 04_circuit/inverter, 04_circuit/fo4 template 내용 미리 훑어보기 (DOE 대기시간 활용 시작)</li>
+  </ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/5(수)</div>
+  <div class="goal-label">1. 오늘 목표: proposed PMOS 확보 + baseline 대비 비교</div>
+  <ul class="check">
+    <li>proposed PMOS Id-Vg 실행 → 수렴 확인</li>
+    <li>proposed PMOS Id-Vd 실행 → 수렴 확인</li>
+    <li>Ion, Ioff, Vth, SS, DIBL, Cgd 추출</li>
+    <li>baseline vs proposed 비교표 작성</li>
+    <li>electric field/current density contour에서 drain 쪽 전계 완화 여부 확인</li>
+    <li>Cgd 변화율(%) 계산</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check">
+    <li>baseline/proposed 구조 비교 그림 정리 시작 (포스터용)</li>
+    <li><b>[일정 조정]</b> unit inverter 구성(IN→INV_driver→INV_DUT→INV_load_4x) 정리 시작</li>
+  </ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/6(목)</div>
+  <div class="goal-label">1. 오늘 목표: DOE 설계공간 확정 + case 생성</div>
+  <ul class="check">
+    <li>project.yaml의 design_space(L_sp_S/L_sp_D/W_low_k 범위)가 실제 확인한 spacer 치수 기준으로 타당한지 재검토, 필요시 조정</li>
+    <li><code>python3 03_doe/generate_cases.py</code> → initial DOE 24개 생성 확인</li>
+    <li><code>python3 03_doe/generate_anchor_cases.py</code> → anchor case 생성 확인</li>
+    <li>두 CSV 내용 훑어보고 범위 벗어난 값 없는지 확인 (TCAD PC 없이도 가능한 작업 — 못했으면 지금 처리)</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check">
+    <li>anchor case 중 baseline reference/center case부터 TCAD 실행 시작</li>
+    <li><b>[일정 조정]</b> DOE case가 도는 동안 VDD, temperature, input pulse rise/fall/time period, transient simulation time, load 조건 확정 (원래 Weekend2 항목)</li>
+  </ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/7(금) — Week2 마감</div>
+  <div class="goal-label">1. 오늘 목표: DOE 실행 착수</div>
+  <ul class="check">
+    <li>남은 anchor case(center, feasible corner) 실행</li>
+    <li>initial DOE 24개 중 가능한 만큼 순차 실행 시작 (다 못 끝내도 OK, 다음 주로 이어짐)</li>
+    <li>실행 결과를 all_results.csv에 누적 정리</li>
+    <li>실패 case는 case_id + 에러 메시지 기록</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check">
+    <li>Week2 산출물(proposed structure 그림, baseline vs proposed 비교표, Id-Vg/Id-Vd 비교 그래프, Cgd/Ion/DIBL 변화율, DOE 두 CSV) 체크</li>
+    <li><b>[일정 조정]</b> tpHL/tpLH, output slew, average power, energy per transition, EDP 측정/계산 기준 확정 + 회로 결과 CSV 템플릿 작성 (원래 Weekend2 항목, 여기서 최대한 마무리해 Week3을 3일로 압축)</li>
+  </ul>
+  <div class="deliverable">산출물: proposed structure 그림, baseline vs proposed 비교표, Id-Vg/Id-Vd 비교 그래프, Cgd/Ion/DIBL 변화율, initial_doe_cases.csv, anchor_cases.csv, (당겨서 처리됐다면) 회로 측정 기준 문서·CSV 템플릿</div>
+</div>
+
+<div class="weekend-block">
+  <div class="day-title">Weekend2 · 08-08(토)~08-09(일) (경량화)</div>
+  <ul class="check">
+    <li>그 주까지의 결과를 all_results.csv로 누적 정리</li>
+    <li>실패 case와 원인 기록</li>
+    <li>baseline vs proposed 비교표 업데이트</li>
+    <li>Week2에서 못 끝낸 회로 조건 확정 항목 있으면 여기서 마무리</li>
+  </ul>
+</div>
+</div>
+
+<!-- ============ WEEK 3 (COMPRESSED) + BUFFER ============ -->
+<div class="week-section">
+<div class="week-header"><h2>Week3 (압축) <span class="range">08-10(월) ~ 08-12(수) · DOE 마무리 + Device Screening</span></h2></div>
+
+<div class="day-card">
+  <div class="day-title">8/10(월)</div>
+  <div class="goal-label">1. 오늘 목표: 남은 DOE 실행 완료 + all_results.csv 정리</div>
+  <ul class="check">
+    <li>남은 initial DOE case 순차 실행 계속 (최우선)</li>
+    <li>실패 case 원인 기록</li>
+    <li>지금까지 결과 all_results.csv로 정리</li>
+    <li>device screening 목적함수 재확인: maximize Ion, minimize Ioff/DIBL/Cgd (project.yaml에 이미 있음)</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>anchor+initial DOE 전량 완료 시도</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/11(화)</div>
+  <div class="goal-label">1. 오늘 목표: device Pareto + active DOE 추천</div>
+  <ul class="check">
+    <li><code>python3 05_results/pareto.py</code> 실행 → device Pareto 계산</li>
+    <li>Cgd-Ion trade-off 확인</li>
+    <li><code>python3 03_doe/suggest_active_cases.py --mode device_screening</code> 실행 → 추천 후보 확인</li>
+    <li>추천된 active DOE 후보들 TCAD 실행 시작 (8개라 하루에 안 끝날 수 있음)</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>MixedMode/회로 시뮬레이션 사용 가능 여부 오늘 확인 (Week4 준비용으로 미리 당김)</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/12(수) — Week3 마감</div>
+  <div class="goal-label">1. 오늘 목표: active DOE 마무리 + predicted vs actual + 회로 후보 확정</div>
+  <ul class="check">
+    <li>active DOE 후보 실행 마무리, all_results.csv 병합</li>
+    <li><code>python3 05_results/predicted_vs_actual.py --mode device_screening</code> 실행 → GP-UCB calibration 확인 (correlation/RMSE/95% CI coverage)</li>
+    <li>회로 검증 후보 3~5개 최종 선정</li>
+    <li>Week3 산출물 체크 (all_results.csv, 실패 case 목록, device Pareto plot, Cgd-Ion trade-off, predicted_vs_actual 결과, 회로 후보 3~5개)</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>Week4 회로 DTCO를 위해 baseline 회로 sanity check(inverter 연결 확인 등) 미리 시작</li></ul>
+  <div class="deliverable">산출물: all_results.csv, 실패 case 목록, device Pareto plot, Cgd vs Ion trade-off 그래프, predicted_vs_actual.csv 및 그래프, 회로 검증 후보 3~5개 목록</div>
+</div>
+
+<div class="day-card buffer-card">
+  <div class="day-title">8/13(목)~8/14(금) — 버퍼 2일</div>
+  <ul class="check">
+    <li><b>지연됐다면</b>: Week1~3 미완료 항목 마무리 (가장 흔한 지연 포인트: mesh 수렴, license seat 대기, 후보 회로 연결 오류)</li>
+    <li><b>정상 진행이면</b>: PMOS source=VDD, NMOS source=GND / gate=IN / drain=OUT 연결 확인, unit inverter VTC 실행, baseline FO4 transient 실행까지 앞당겨 시도</li>
+    <li>보고서 소자 섹션 초안 정리 (Weekend3에 몰리지 않도록)</li>
+  </ul>
+</div>
+
+<div class="weekend-block">
+  <div class="day-title">Weekend3 · 08-15(토)~08-16(일)</div>
+  <ul class="check">
+    <li>device Pareto plot, Cgd-Ion trade-off 그래프 최종 정리</li>
+    <li>회로 검증 후보 3~5개 CSV 확정</li>
+    <li>보고서 소자 섹션 작성</li>
+  </ul>
+</div>
+</div>
+
+<!-- ============ WEEK 4 ============ -->
+<div class="week-section">
+<div class="week-header"><h2>Week4 <span class="range">08-17(월) ~ 08-21(금) · 회로 DTCO (unit inverter + FO4)</span></h2></div>
+
+<div class="day-card">
+  <div class="day-title">8/17(월)</div>
+  <div class="goal-label">1. 오늘 목표: baseline 회로 sanity check 마무리 + 후보 검증 시작</div>
+  <ul class="check">
+    <li>(버퍼에서 안 했다면) PMOS source=VDD, NMOS source=GND / gate=IN / drain=OUT 연결 확인</li>
+    <li>unit inverter VTC 실행, switching 정상 여부 확인</li>
+    <li>baseline FO4 transient 실행, tpHL/tpLH/delay/power/energy/EDP 추출</li>
+    <li>후보별 NMOS/PMOS 파일·source/drain 방향 확인 시작</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>첫 후보 unit inverter VTC 실행 시작</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/18(화)</div>
+  <div class="goal-label">1. 오늘 목표: 후보별 unit inverter 검증</div>
+  <ul class="check">
+    <li>후보 3~5개 unit inverter VTC 실행, 정상 switching 여부 확인 (drain-side composite spacer가 OUT 쪽을 향하도록 배치됐는지 재확인)</li>
+    <li>switching 정상인 후보만 FO4로 넘길 리스트 확정</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>첫 후보 FO4 transient 실행 시작</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/19(수)</div>
+  <div class="goal-label">1. 오늘 목표: FO4 실행 본격화</div>
+  <ul class="check">
+    <li>후보별 FO4 transient 실행 (하루에 되는 만큼)</li>
+    <li>tpHL/tpLH, FO4 delay, output slew, average power, energy per transition, EDP 추출</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>남은 후보 FO4 실행 계속</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/20(목)</div>
+  <div class="goal-label">1. 오늘 목표: FO4 마무리 + circuit Pareto</div>
+  <ul class="check">
+    <li>남은 후보 FO4 실행 마무리</li>
+    <li><code>python3 05_results/pareto.py</code> (circuit_dtco 목적함수)로 circuit Pareto 계산</li>
+    <li>필요시 <code>python3 03_doe/suggest_active_cases.py --mode circuit_dtco</code>로 추가 후보 추천</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>circuit_dtco active DOE 추천 후보 있으면 실행 시작</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/21(금) — Week4 마감</div>
+  <div class="goal-label">1. 오늘 목표: circuit_dtco 마무리 + 예측 검증</div>
+  <ul class="check">
+    <li>circuit_dtco active DOE 후보 실행 마무리 (있다면)</li>
+    <li><code>python3 05_results/predicted_vs_actual.py --mode circuit_dtco</code> 실행</li>
+    <li>circuit Pareto plot 정리, 회로 기준 최종 후보 1~2개로 압축</li>
+    <li>Week4 산출물 체크 (baseline/후보별 inverter VTC, FO4 waveform, delay/power/energy/EDP 표, circuit Pareto plot)</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>보고서 회로 섹션 초안 시작</li></ul>
+  <div class="deliverable">산출물: baseline/후보별 inverter VTC, FO4 waveform, delay/power/energy/EDP 표, circuit Pareto plot, (해당 시) circuit_dtco 모드 예측 vs 실측 비교 결과</div>
+</div>
+
+<div class="weekend-block">
+  <div class="day-title">Weekend4 · 08-22(토)~08-23(일)</div>
+  <ul class="check">
+    <li>circuit Pareto plot 정리, 회로 기준 최종 후보 1~2개 압축</li>
+    <li>보고서 회로 섹션 작성</li>
+  </ul>
+</div>
+</div>
+
+<!-- ============ WEEK 5 ============ -->
+<div class="week-section">
+<div class="week-header"><h2>Week5 <span class="range">08-24(월) ~ 08-28(금) · Local Refinement + Robust Validation</span></h2></div>
+
+<div class="day-card">
+  <div class="day-title">8/24(월)</div>
+  <div class="goal-label">1. 오늘 목표: local refinement 착수</div>
+  <ul class="check">
+    <li>회로 DTCO 결과 기준 최종 후보 1~2개 확정</li>
+    <li><code>python3 03_doe/generate_local_refinement_cases.py</code> 실행 → grid-snapped case 생성</li>
+    <li>grid-snapped case TCAD 실행 시작</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>local refinement case 실행 계속</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/25(화)</div>
+  <div class="goal-label">1. 오늘 목표: local refinement 마무리</div>
+  <ul class="check">
+    <li>local refinement case 실행 마무리, all_results.csv 병합</li>
+    <li>FO4 재평가, circuit Pareto 업데이트</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>robust validation 준비 (variation case 생성 조건 재확인)</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/26(수)</div>
+  <div class="goal-label">1. 오늘 목표: robust case 생성 및 실행 시작</div>
+  <ul class="check">
+    <li><code>python3 03_doe/generate_robust_cases.py</code> 실행 → ±0.3/±0.5nm variation case 생성</li>
+    <li>robust case TCAD 실행 시작 (one-at-a-time variation부터)</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li>combined corner variation도 실행 시작</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/27(목)</div>
+  <div class="goal-label">1. 오늘 목표: robust case 실행 계속</div>
+  <ul class="check">
+    <li>남은 robust variation case 실행 (combined corner 포함)</li>
+    <li>robust result CSV 누적 정리</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li><code>python3 05_results/robust_optimum.py</code>, <code>python3 05_results/yield_like.py</code> 시험 실행 (부분 데이터로 형식 확인용)</li></ul>
+</div>
+
+<div class="day-card">
+  <div class="day-title">8/28(금) — Week5 마감</div>
+  <div class="goal-label">1. 오늘 목표: robust 분석 마무리</div>
+  <ul class="check">
+    <li>남은 robust case 실행 완료</li>
+    <li><code>python3 05_results/robust_optimum.py</code> 실행 → Ion 유지율/Cgd 개선 유지율/robust score 계산</li>
+    <li><code>python3 05_results/yield_like.py</code> 실행 → yield-like spec pass rate 계산</li>
+    <li><code>python3 05_results/predicted_vs_actual.py</code> 최종 재확인 (있다면)</li>
+    <li>nominal optimum vs robust optimum 비교 정리</li>
+  </ul>
+  <div class="extra-label">2. 시간이 남으면</div>
+  <ul class="check"><li><code>python3 05_results/plot_figures.py</code> 실행해서 전체 figure 일괄 생성</li></ul>
+  <div class="deliverable">산출물: grid-snapped 최종 후보, robust 소자/회로 결과 CSV, robust summary table</div>
+</div>
+
+<div class="weekend-block">
+  <div class="day-title">Weekend5 · 08-29(토)~08-30(일)</div>
+  <ul class="check">
+    <li>robust summary table/plot 최종 정리</li>
+    <li>nominal vs robust 최종 스토리 정리</li>
+  </ul>
+</div>
+</div>
+
+<!-- ============ DEADLINE ============ -->
+<div class="week-section">
+<div class="week-header"><h2>마감일 <span class="range">08-31(월)</span></h2></div>
+<div class="day-card">
+  <div class="day-title">8/31(월) — 최종 정리 및 제출</div>
+  <ul class="check">
+    <li>TODO.md §3(최종 제출물) 체크리스트 전체 확인</li>
+    <li>TODO.md §4(연구윤리) 체크리스트 전체 확인 — "최초 제안" 등 과장 표현 최종 점검</li>
+    <li>보고서/포스터/발표자료 최종본 정리 및 제출</li>
+  </ul>
+</div>
+<p class="footer-note">본 문서는 TODO.md의 0절 캘린더·1절 주차별 체크리스트를 하루 단위로 펼친 실행용 스케줄이다. 진행 상황 체크(완료 표시)와 세부 항목 변경은 TODO.md에서 하고, 일정이 크게 바뀌면 이 문서를 다시 생성해 갱신한다. 소스 파일: 07_docs/daily_schedule.html</p>
+</div>
+
+</body>
+</html>

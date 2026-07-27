@@ -28,12 +28,15 @@ SOI FinFET에서 drain-side low-k composite spacer 구조를 설계하고,
 
 평일 = 학교 TCAD PC 실행, 주말 = 결과 정리 및 보고서/발표자료 준비. 확인된 TCAD 툴은 Synopsys Sentaurus(SWB, sprocess/sdevice)다. 진행이 늦어지면 6절 "최소 성공 기준"으로 범위를 축소한다. 각 항목의 상세 체크리스트는 1절의 같은 주차 번호를 참고한다.
 
+**일정 조정(2026-07-27 반영)**: 회로 DTCO(Week4)와 robust validation(Week5)이 가장 시간이 오래 걸리는 구간이라, 원래 5일씩이던 Week3을 3일(08-10~08-12)로 압축하고 08-13~08-14를 명시적 버퍼 2일로 뺐다. 압축은 원래 Weekend2에 있던 "회로 조건 사전 확정"(04_circuit template 검토, VDD/temperature/pulse 조건, 측정 기준, CSV 템플릿) 작업을 Week2의 TCAD 대기 시간(DOE case가 돌아가는 동안)으로 당겨서 처리하는 방식으로 확보한다. 버퍼 2일은 Week1~3이 밀리면 그걸 흡수하는 용도, 정상 진행이면 Week4 baseline 회로 sanity check를 조기 착수하는 용도로 쓴다. 이 조정은 Week1~2 실제 진행 속도를 보고 다시 보정할 수 있다. 일별 세부 실행 스케줄은 `07_docs/daily_schedule.pdf`를 참고한다.
+
 - [ ] 2026-07-25(토)~07-26(일) — Week0: 준비 및 프로젝트 이해
 - [ ] 2026-07-27(월)~07-31(금) — Week1: 환경 확인 + baseline 구조/지표 확보
 - [ ] 2026-08-01(토)~08-02(일) — Weekend1: baseline 결과 정리, 보고서 배경/선행연구 초안
-- [ ] 2026-08-03(월)~08-07(금) — Week2: proposed 구현 + initial DOE/anchor 생성 및 실행 착수
-- [ ] 2026-08-08(토)~08-09(일) — Weekend2: all_results.csv 누적 정리, baseline vs proposed 비교, 회로 조건 사전 확정
-- [ ] 2026-08-10(월)~08-14(금) — Week3: DOE 실행 마무리 + device screening + 회로 실행 환경 확인
+- [ ] 2026-08-03(월)~08-07(금) — Week2: proposed 구현 + initial DOE/anchor 생성 및 실행 착수 (회로 조건 사전 확정 작업도 이 주 TCAD 대기시간에 최대한 당겨서 처리)
+- [ ] 2026-08-08(토)~08-09(일) — Weekend2: all_results.csv 누적 정리, baseline vs proposed 비교, 회로 조건 사전 확정 마무리(대부분 Week2에서 처리됐다면 경량화)
+- [ ] 2026-08-10(월)~08-12(수) — Week3(압축, 5일→3일): DOE 실행 마무리 + device screening + 회로 실행 환경 확인
+- [ ] 2026-08-13(목)~08-14(금) — 버퍼 2일: Week1~3 지연분 흡수, 정상 진행 시 Week4 회로 baseline sanity check 조기 착수
 - [ ] 2026-08-15(토)~08-16(일) — Weekend3: device Pareto 정리, 회로 검증 후보 확정, 보고서 소자 섹션
 - [ ] 2026-08-17(월)~08-21(금) — Week4: unit inverter + FO4 회로 DTCO 실행
 - [ ] 2026-08-22(토)~08-23(일) — Weekend4: circuit Pareto 정리, 최종 후보 압축, 보고서 회로 섹션
@@ -112,6 +115,8 @@ DOE 착수:
 - [ ] baseline, center, feasible corner 우선 실행
 - [ ] DOE case 실행 시작
 
+DOE case가 TCAD PC에서 도는 동안(대기 시간)에는 아래 Weekend2 항목(회로 조건 사전 확정)을 최대한 당겨서 처리한다 — Week3을 3일로 압축하기 위한 전제 조건이다.
+
 산출물: proposed structure 그림, baseline vs proposed 비교표, Id-Vg/Id-Vd 비교 그래프, Cgd/Ion/DIBL 변화율, `03_doe/cases/initial_doe_cases.csv`, `03_doe/cases/anchor_cases.csv`
 
 ### Weekend2 (08-08~08-09): 정리 + 회로 조건 사전 확정
@@ -127,7 +132,9 @@ DOE 착수:
 
 산출물: 회로 측정 기준 문서, delay/power/energy/EDP 계산식, 회로 결과 CSV 템플릿
 
-### Week3 (08-10~08-14, 평일): DOE 마무리 + Device Screening + 회로 환경 확인
+### Week3 (08-10~08-12, 평일, 압축): DOE 마무리 + Device Screening + 회로 환경 확인
+
+08-13~08-14는 버퍼로 뺐다 (0절 "일정 조정" 참고). 아래 체크리스트는 그대로이나 실행 기간이 3일로 압축됐다.
 
 - [ ] 남은 DOE case 실행 완료
 - [ ] 실패 case와 원인 기록
@@ -142,6 +149,12 @@ DOE 착수:
 - [ ] MixedMode 또는 회로 시뮬레이션 사용 가능 여부 확인 (TCAD PC에서)
 
 산출물: `05_results/summary/all_results.csv`, 실패 case 목록, device Pareto plot, Cgd vs Ion trade-off 그래프, `05_results/summary/predicted_vs_actual.csv` 및 예측 vs 실측 그래프, 회로 검증 후보 3~5개 목록
+
+### 버퍼 (08-13~08-14)
+
+- [ ] Week1~3 미완료 항목이 있으면 여기서 마무리
+- [ ] 정상 진행이면 Week4 baseline 회로 sanity check(PMOS/NMOS 연결 확인, unit inverter VTC, baseline FO4 transient) 조기 착수
+- [ ] 보고서 소자 섹션 초안을 Weekend3 전에 미리 정리
 
 ### Weekend3 (08-15~08-16): 정리
 

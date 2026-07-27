@@ -54,6 +54,8 @@
 - 실제 작업을 시작하거나 완료했을 때
 - 프로젝트 흐름이 바뀌었을 때
 
+관련 파일: `07_docs/daily_schedule.html` / `07_docs/daily_schedule.pdf` — TODO.md의 0절 캘린더·1절 주차별 체크리스트를 하루 단위 실행 스케줄로 펼친 문서. 진행 상황 체크와 항목 변경은 TODO.md에서 하고, 일정이 크게 바뀔 때만 html을 수정해 pdf를 다시 렌더링한다 (`google-chrome --headless --print-to-pdf=07_docs/daily_schedule.pdf 07_docs/daily_schedule.html`). TODO.md와 daily_schedule 사이에 캘린더 불일치가 생기지 않도록 주의한다.
+
 ### `project.yaml`
 
 프로젝트의 공통 설정 파일이다.
